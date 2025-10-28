@@ -58,6 +58,11 @@
     </main>
 
     <Toast />
+
+    <footer class="site-footer">
+      <router-link to="/privacy" class="footer-link">Integritetspolicy (GDPR)</router-link>
+    </footer>
+
   </div>
 </template>
 
@@ -348,5 +353,28 @@ th, td {
   width: min(400px,90vw);
   display: grid;
   row-gap: var(--space-md);
+}
+.site-footer {
+  margin-top: 3rem;
+  padding: 1.25rem 0;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-dim);
+}
+
+.footer-link {
+  color: var(--text-main);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(148,163,184,.35);
+  padding-bottom: 2px;
+  transition: color .15s ease, border-color .15s ease;
+}
+.footer-link:hover {
+  color: var(--text-main);
+  border-color: var(--text-main);
+}
+.footer-link:visited {
+  color: var(--text-dim);
+  border-color: rgba(148,163,184,.35);
 }
 </style>
