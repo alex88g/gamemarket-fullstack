@@ -8,6 +8,7 @@ import MyListingsView from '../views/MyListingsView.vue'
 import MyOrdersView from '../views/MyOrdersView.vue'
 import AdminView from '../views/AdminView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
+import UserProfileView from '../views/UserProfileView.vue'
 
 const routes = [
   { path: '/', component: MarketplaceView },
@@ -16,6 +17,7 @@ const routes = [
   { path: '/orders', component: MyOrdersView },
   { path: '/admin', component: AdminView },
   { path: '/privacy', component: PrivacyView },
+  { path: '/userProfile', component: UserProfileView },
 ]
 
 const router = createRouter({

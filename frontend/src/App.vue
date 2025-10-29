@@ -24,6 +24,14 @@
             Mina köp
           </router-link>
 
+          <router-link
+            v-if="auth.isLoggedIn && auth.user?.role !== 'admin'"
+            to="/userProfile"
+            class="nav-btn"
+          >
+            Profil
+          </router-link>
+
           <!-- Visa bara för admin -->
           <router-link
             v-if="auth.user?.role === 'admin'"
