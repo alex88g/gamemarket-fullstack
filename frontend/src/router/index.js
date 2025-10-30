@@ -1,6 +1,8 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store/auth.js'
+import GameInfoView from '../views/GameInfoView.vue'
+
 
 import MarketplaceView from '../views/MarketplaceView.vue'
 import LoginRegisterView from '../views/LoginRegisterView.vue'
@@ -20,6 +22,7 @@ const routes = [
   { path: '/privacy', component: PrivacyView },
   { path: '/userProfile', component: UserProfileView },
   { path: '/cart', component: CartView },     // <-- NY
+  { path: '/game/:id', component: GameInfoView },
 ]
 
 const router = createRouter({
