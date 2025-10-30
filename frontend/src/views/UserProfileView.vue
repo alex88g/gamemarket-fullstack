@@ -8,20 +8,26 @@
     </div>
 
     <div class="row">
-      <div class="input-group">
-        <label class="input-label" for="username">Användarnamn</label>
-        <input id="username" class="input-field" v-model="me.username" />
-      </div>
+      <div v-if="loading">Laddar...</div>
 
-      <div class="input-group">
-        <label class="input-label" for="email">E-post</label>
-        <input id="email" class="input-field" type="email" v-model="me.email" />
-      </div>
+      <template v-else>
+        <div class="input-group">
+          <label class="input-label" for="username">Användarnamn</label>
+          <input id="username" class="input-field" v-model="username" />
+        </div>
 
-      <div class="row-2col" style="margin-top:.5rem">
-        <button class="btn primary" @click="saveLater">Spara ändringar</button>
-        <button class="btn danger" @click="deleteLater">Radera konto</button>
-      </div>
+        <div class="input-group">
+          <label class="input-label" for="email">E-post</label>
+          <input id="email" class="input-field" type="email" v-model="email" />
+        </div>
+
+        <div class="row-2col" style="margin-top:.5rem">
+          <button class="btn primary" :disabled="!dirty || saving" @click="save">
+            {{ saving ? 'Sparar…' : 'Spara ändringar' }}
+          </button>
+          <button class="btn danger" @click="removeAccount">Radera konto</button>
+        </div>
+      </template>
     </div>
   </section>
 
@@ -32,25 +38,68 @@
 </template>
 
 <script setup>
-import { reactive, watchEffect } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import api from '../api.js'
 import { useAuthStore } from '../store/auth.js'
 import { useToastStore } from '../store/toast.js'
 
 const auth = useAuthStore()
 const toast = useToastStore()
 
-// Storing locally so you can PUT later
-const me = reactive({ username: '', email: '' })
+const username = ref('')
+const email = ref('')
+const loading = ref(true)
+const saving = ref(false)
 
-watchEffect(() => {
-  me.username = auth.user?.username || ''
-  me.email = auth.user?.email || ''
-})
+const dirty = computed(() =>
+  username.value !== (auth.user?.username || '') ||
+  email.value !== (auth.user?.email || '')
+)
 
-function saveLater() {
-  toast.push('Sparfunktion kommer snart', 'info')
+async function loadMe() {
+  try {
+    // Get user from DB instead of auth
+    const { data } = await api.get('/me')
+    username.value = data.username || ''
+    email.value = data.email || ''
+    // Update auth with db data as well
+    auth.user = { ...auth.user, ...data }
+  } catch (err) {
+    toast.push('Kunde inte hämta profil', 'error')
+  } finally {
+    loading.value = false
+  }
 }
-function deleteLater() {
-  toast.push('Radering kommer snart', 'warn')
+
+async function save() {
+  if (!dirty.value) return
+  saving.value = true
+  try {
+    const { data } = await api.put('/me', { username: username.value, email: email.value })
+    // update auth and input fields with db data
+    auth.user = { ...auth.user, ...data }
+    username.value = data.username
+    email.value = data.email
+    toast.push('Sparat ✅', 'success')
+  } catch (err) {
+    const msg = err?.response?.data?.message || 'Kunde inte spara'
+    toast.push(msg, 'error')
+  } finally {
+    saving.value = false
+  }
 }
+
+async function removeAccount() {
+  if (!confirm('Är du säker? Detta går inte att ångra.')) return
+  try {
+    await api.delete('/me')
+    auth.logout()
+    toast.push('Kontot raderat', 'success')
+    window.location.href = '/'
+  } catch (err) {
+    toast.push('Kunde inte radera konto', 'error')
+  }
+}
+
+onMounted(loadMe)
 </script>
