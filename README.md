@@ -30,6 +30,7 @@ npm i -D nodemon
 
 Lägg till scripts i `package.json` (se filen nedan). Starta dev-servern:
 
+
 ```bash
 npm run dev
 # eller
