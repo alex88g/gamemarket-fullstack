@@ -1,4 +1,4 @@
-// controllers/authController.js
+// backend/controllers/authController.js
 import { pool } from '../db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -7,9 +7,8 @@ export async function register(req, res) {
   try {
     const { username, email, password } = req.body;
 
-    // kolla om finns redan
-    const [existing] = await pool.query(
-      'SELECT id FROM users WHERE email = ? OR username = ?',
+    const { rows: existing } = await pool.query(
+      'SELECT id FROM users WHERE email = $1 OR username = $2',
       [email, username]
     );
     if (existing.length > 0) {
@@ -18,13 +17,13 @@ export async function register(req, res) {
 
     const hash = await bcrypt.hash(password, 10);
 
-    const [result] = await pool.query(
-      'INSERT INTO users (username, email, password_hash, role) VALUES (?,?,?,?)',
+    const { rows } = await pool.query(
+      'INSERT INTO users (username, email, password_hash, role) VALUES ($1,$2,$3,$4) RETURNING id',
       [username, email, hash, 'user']
     );
 
     return res.status(201).json({
-      id: result.insertId,
+      id: rows[0].id,
       username,
       email,
       role: 'user',
@@ -39,8 +38,8 @@ export async function login(req, res) {
   try {
     const { email, password } = req.body;
 
-    const [rows] = await pool.query(
-      'SELECT * FROM users WHERE email = ?',
+    const { rows } = await pool.query(
+      'SELECT * FROM users WHERE email = $1',
       [email]
     );
 

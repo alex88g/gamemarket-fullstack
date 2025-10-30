@@ -1,25 +1,21 @@
-// db.js
-import mysql from 'mysql2/promise'
-import dotenv from 'dotenv'
-dotenv.config()
+// backend/db.js
+import dotenv from 'dotenv';
+dotenv.config();
 
+import pkg from 'pg';
+const { Pool } = pkg;
 
-export const pool = mysql.createPool({
-host: process.env.DB_HOST,
-user: process.env.DB_USER,
-password: process.env.DB_PASS,
-database: process.env.DB_NAME,
-connectionLimit: 10,
-namedPlaceholders: true,
-})
+// PGURI ex: postgres://postgres:PW@database:5432/appdb
+export const pool = new Pool({
+  connectionString: process.env.PGURI,
+});
 
-
-// Hjälpfunktion (valfri) för att testa DB vid start
 export async function assertDbConnection() {
-const conn = await pool.getConnection()
-try {
-await conn.ping()
-} finally {
-conn.release()
-}
+  const client = await pool.connect();
+  try {
+    await client.query('SELECT 1');
+    console.log('✅ PostgreSQL connected');
+  } finally {
+    client.release();
+  }
 }

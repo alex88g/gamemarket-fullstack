@@ -2,12 +2,11 @@
 import { pool } from '../db.js'
 
 // GET /api/admin/games
-// alla annonser med ägare
 export async function getAllGamesAdmin(req, res) {
   try {
-    const [rows] = await pool.query(`
+    const { rows } = await pool.query(`
       SELECT g.*,
-             u.username AS ownerName
+             u.username AS "ownerName"
       FROM games g
       JOIN users u ON u.id = g.owner_id
       ORDER BY g.created_at DESC
@@ -20,14 +19,12 @@ export async function getAllGamesAdmin(req, res) {
 }
 
 // PUT /api/admin/games/:id
-// admin kan ändra status (t.ex. blockera annons) eller uppdatera annan info
 export async function adminUpdateGame(req, res) {
   try {
     const gameId = req.params.id
 
-    // hämta nuvarande värden
-    const [rows] = await pool.query(
-      'SELECT * FROM games WHERE id = ?',
+    const { rows } = await pool.query(
+      'SELECT * FROM games WHERE id = $1',
       [gameId]
     )
     if (rows.length === 0) {
@@ -35,7 +32,6 @@ export async function adminUpdateGame(req, res) {
     }
     const current = rows[0]
 
-    // nya värden som kan komma från admin
     const {
       title,
       platform,
@@ -46,7 +42,6 @@ export async function adminUpdateGame(req, res) {
       image_url,
     } = req.body
 
-    // välj nytt värde om det skickades in, annars behåll gamla
     const nextData = {
       title:                title                ?? current.title,
       platform:             platform             ?? current.platform,
@@ -60,14 +55,14 @@ export async function adminUpdateGame(req, res) {
     await pool.query(
       `
       UPDATE games
-      SET title = ?,
-          platform = ?,
-          description = ?,
-          price_sell = ?,
-          price_rent_per_month = ?,
-          status = ?,
-          image_url = ?
-      WHERE id = ?
+      SET title = $1,
+          platform = $2,
+          description = $3,
+          price_sell = $4,
+          price_rent_per_month = $5,
+          status = $6,
+          image_url = $7
+      WHERE id = $8
       `,
       [
         nextData.title,
