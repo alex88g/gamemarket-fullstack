@@ -1,11 +1,11 @@
 // backend/controllers/cartController.js
 import { pool } from '../db.js'
 
-// GET /api/cart  (mina korgartiklar med spelinfo)
+// GET /api/cart
 export async function getMyCart(req, res) {
   try {
     const userId = req.user.id
-    const [rows] = await pool.query(
+    const { rows } = await pool.query(
       `SELECT
          c.id,
          c.game_id,
@@ -18,11 +18,11 @@ export async function getMyCart(req, res) {
          g.price_rent_per_month,
          g.status AS game_status,
          g.owner_id,
-         u.username AS ownerName
+         u.username AS "ownerName"
        FROM cart_items c
        JOIN games g ON g.id = c.game_id
        JOIN users u ON u.id = g.owner_id
-       WHERE c.user_id = ?
+       WHERE c.user_id = $1
        ORDER BY c.created_at DESC`,
       [userId]
     )
@@ -33,7 +33,7 @@ export async function getMyCart(req, res) {
   }
 }
 
-// POST /api/cart  body: { gameId, type: 'buy'|'rent', rental_months? }
+// POST /api/cart
 export async function addToCart(req, res) {
   try {
     const userId = req.user.id
@@ -42,8 +42,8 @@ export async function addToCart(req, res) {
     if (!gameId || !type) {
       return res.status(400).json({ message: 'gameId och type krävs' })
     }
-    // hämta spelet
-    const [gRows] = await pool.query('SELECT * FROM games WHERE id = ?', [gameId])
+
+    const { rows: gRows } = await pool.query('SELECT * FROM games WHERE id = $1', [gameId])
     if (gRows.length === 0) return res.status(404).json({ message: 'Game not found' })
     const game = gRows[0]
 
@@ -69,11 +69,12 @@ export async function addToCart(req, res) {
       return res.status(400).json({ message: 'Ogiltig type' })
     }
 
-    // sätt eller uppdatera (tack vare UNIQUE(user_id, game_id))
+    // ON CONFLICT istället för MySQLs ON DUPLICATE KEY
     await pool.query(
       `INSERT INTO cart_items (user_id, game_id, type, rental_months)
-       VALUES (?,?,?,?)
-       ON DUPLICATE KEY UPDATE type=VALUES(type), rental_months=VALUES(rental_months)`,
+       VALUES ($1,$2,$3,$4)
+       ON CONFLICT (user_id, game_id)
+       DO UPDATE SET type = EXCLUDED.type, rental_months = EXCLUDED.rental_months`,
       [userId, gameId, type, months]
     )
 
@@ -84,12 +85,12 @@ export async function addToCart(req, res) {
   }
 }
 
-// DELETE /api/cart/:id  (ta bort en rad från korgen)
+// DELETE /api/cart/:id
 export async function removeCartItem(req, res) {
   try {
     const userId = req.user.id
     const id = req.params.id
-    await pool.query('DELETE FROM cart_items WHERE id = ? AND user_id = ?', [id, userId])
+    await pool.query('DELETE FROM cart_items WHERE id = $1 AND user_id = $2', [id, userId])
     res.json({ message: 'Borttagen' })
   } catch (e) {
     console.error('removeCartItem error:', e)
@@ -97,11 +98,11 @@ export async function removeCartItem(req, res) {
   }
 }
 
-// DELETE /api/cart  (töm korgen)
+// DELETE /api/cart
 export async function clearCart(req, res) {
   try {
     const userId = req.user.id
-    await pool.query('DELETE FROM cart_items WHERE user_id = ?', [userId])
+    await pool.query('DELETE FROM cart_items WHERE user_id = $1', [userId])
     res.json({ message: 'Korgen tömd' })
   } catch (e) {
     console.error('clearCart error:', e)
@@ -109,17 +110,16 @@ export async function clearCart(req, res) {
   }
 }
 
-// POST /api/cart/checkout  (skapa ordrar från korgen)
+// POST /api/cart/checkout
 export async function checkoutCart(req, res) {
   const userId = req.user.id
-  let conn
+  let client
   try {
-    // hämta korgen
-    const [items] = await pool.query(
+    const { rows: items } = await pool.query(
       `SELECT c.*, g.price_sell, g.price_rent_per_month, g.status AS game_status
        FROM cart_items c
        JOIN games g ON g.id = c.game_id
-       WHERE c.user_id = ?
+       WHERE c.user_id = $1
        ORDER BY c.created_at ASC`,
       [userId]
     )
@@ -127,16 +127,18 @@ export async function checkoutCart(req, res) {
       return res.status(400).json({ message: 'Korgen är tom' })
     }
 
-    conn = await pool.getConnection()
-    await conn.beginTransaction()
+    client = await pool.connect()
+    await client.query('BEGIN')
 
     const created = []
     const errors = []
 
-    // gå igenom varje rad och försök skapa order
     for (const it of items) {
-      // dubbelkolla availability vid checkout
-      const [gRows] = await conn.query('SELECT * FROM games WHERE id = ? FOR UPDATE', [it.game_id])
+      // lås raden för att undvika race
+      const { rows: gRows } = await client.query(
+        'SELECT * FROM games WHERE id = $1 FOR UPDATE',
+        [it.game_id]
+      )
       if (!gRows.length) {
         errors.push({ cart_id: it.id, reason: 'Annons saknas' })
         continue
@@ -157,14 +159,14 @@ export async function checkoutCart(req, res) {
           continue
         }
         const total = Number(g.price_sell)
-        const [orderResult] = await conn.query(
+        const { rows: orderRows } = await client.query(
           `INSERT INTO orders (game_id, buyer_id, type, rental_months, total_price)
-           VALUES (?,?,?,?,?)`,
+           VALUES ($1,$2,$3,$4,$5) RETURNING id`,
           [g.id, userId, 'buy', null, total]
         )
-        await conn.query('UPDATE games SET status = ? WHERE id = ?', ['sold', g.id])
-        await conn.query('DELETE FROM cart_items WHERE id = ?', [it.id])
-        created.push({ order_id: orderResult.insertId, game_id: g.id, type: 'buy', total_price: total })
+        await client.query('UPDATE games SET status = $1 WHERE id = $2', ['sold', g.id])
+        await client.query('DELETE FROM cart_items WHERE id = $1', [it.id])
+        created.push({ order_id: orderRows[0].id, game_id: g.id, type: 'buy', total_price: total })
       } else if (it.type === 'rent') {
         if (g.price_rent_per_month == null) {
           errors.push({ cart_id: it.id, reason: 'Inte möjlig att hyra' })
@@ -172,27 +174,26 @@ export async function checkoutCart(req, res) {
         }
         const months = Math.max(1, parseInt(it.rental_months || 1, 10))
         const total = Number(g.price_rent_per_month) * months
-        const [orderResult] = await conn.query(
+        const { rows: orderRows } = await client.query(
           `INSERT INTO orders (game_id, buyer_id, type, rental_months, total_price)
-           VALUES (?,?,?,?,?)`,
+           VALUES ($1,$2,$3,$4,$5) RETURNING id`,
           [g.id, userId, 'rent', months, total]
         )
-        await conn.query('UPDATE games SET status = ? WHERE id = ?', ['rented', g.id])
-        await conn.query('DELETE FROM cart_items WHERE id = ?', [it.id])
-        created.push({ order_id: orderResult.insertId, game_id: g.id, type: 'rent', rental_months: months, total_price: total })
+        await client.query('UPDATE games SET status = $1 WHERE id = $2', ['rented', g.id])
+        await client.query('DELETE FROM cart_items WHERE id = $1', [it.id])
+        created.push({ order_id: orderRows[0].id, game_id: g.id, type: 'rent', rental_months: months, total_price: total })
       } else {
         errors.push({ cart_id: it.id, reason: 'Okänd typ' })
       }
     }
 
-    await conn.commit()
-
+    await client.query('COMMIT')
     return res.json({ created, errors })
   } catch (e) {
-    if (conn) await conn.rollback()
+    if (client) await client.query('ROLLBACK')
     console.error('checkoutCart error:', e)
     res.status(500).json({ message: 'Server error' })
   } finally {
-    if (conn) conn.release()
+    if (client) client.release()
   }
 }
