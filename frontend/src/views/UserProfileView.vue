@@ -59,7 +59,7 @@ const dirty = computed(() =>
 async function loadMe() {
   try {
     // Get user from DB instead of auth
-    const { data } = await api.get('/me')
+    const { data } = await api.get('/user/me')
     username.value = data.username || ''
     email.value = data.email || ''
     // Update auth with db data as well
@@ -75,7 +75,7 @@ async function save() {
   if (!dirty.value) return
   saving.value = true
   try {
-    const { data } = await api.put('/me', { username: username.value, email: email.value })
+    const { data } = await api.put('/user/me', { username: username.value, email: email.value })
     // update auth and input fields with db data
     auth.user = { ...auth.user, ...data }
     username.value = data.username
@@ -92,7 +92,7 @@ async function save() {
 async function removeAccount() {
   if (!confirm('Är du säker? Detta går inte att ångra.')) return
   try {
-    await api.delete('/me')
+    await api.delete('/user/me')
     auth.logout()
     toast.push('Kontot raderat', 'success')
     window.location.href = '/'
