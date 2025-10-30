@@ -19,7 +19,6 @@ export async function assertDbConnection() {
 const conn = await pool.getConnection()
 try {
 await conn.ping()
-console.log('✅ MySQL connected')
 } finally {
 conn.release()
 }
