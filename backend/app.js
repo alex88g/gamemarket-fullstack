@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes.js'
 import gameRoutes from './routes/gameRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
+import cartRoutes from './routes/cartRoutes.js'
 
 dotenv.config()
 
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/games', gameRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/cart', cartRoutes)
 
 // healthcheck
 app.get('/api/health', (req, res) => {

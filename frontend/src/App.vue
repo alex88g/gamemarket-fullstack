@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <header class="navbar">
-      <nav class="nav-inner">
+      <nav class="nav-inner" role="navigation" aria-label="Huvudmeny">
         <router-link to="/" class="brand">GameMarket 🎮</router-link>
 
         <div class="nav-links">
@@ -9,7 +9,7 @@
 
           <!-- Visa bara för vanliga användare -->
           <router-link
-            v-if="auth.isLoggedIn && auth.user?.role !== 'admin'"
+            v-if="auth.isLoggedIn && !isAdmin"
             to="/mine"
             class="nav-btn"
           >
@@ -17,7 +17,7 @@
           </router-link>
 
           <router-link
-            v-if="auth.isLoggedIn && auth.user?.role !== 'admin'"
+            v-if="auth.isLoggedIn && !isAdmin"
             to="/orders"
             class="nav-btn"
           >
@@ -25,7 +25,20 @@
           </router-link>
 
           <router-link
-            v-if="auth.isLoggedIn && auth.user?.role !== 'admin'"
+            v-if="auth.isLoggedIn && !isAdmin"
+            to="/cart"
+            class="nav-btn cart-link"
+          >
+            Kundvagn
+            <span
+              v-if="cart.count > 0"
+              class="cart-badge"
+              aria-label="Antal varor i kundvagnen"
+            >{{ cart.count }}</span>
+          </router-link>
+
+          <router-link
+            v-if="auth.isLoggedIn && !isAdmin"
             to="/userProfile"
             class="nav-btn"
           >
@@ -34,7 +47,7 @@
 
           <!-- Visa bara för admin -->
           <router-link
-            v-if="auth.user?.role === 'admin'"
+            v-if="isAdmin"
             to="/admin"
             class="nav-btn admin"
           >
@@ -70,17 +83,23 @@
     <footer class="site-footer">
       <router-link to="/privacy" class="footer-link">Integritetspolicy (GDPR)</router-link>
     </footer>
-
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useAuthStore } from './store/auth.js'
+import { useCartStore } from './store/cart.js'
 import Toast from './components/Toast.vue'
 
 const auth = useAuthStore()
+const cart = useCartStore()
+
+const isAdmin = computed(() => auth.user?.role === 'admin')
 
 function logout() {
+  // Valfritt: töm kundvagn vid utloggning
+  try { cart.clear() } catch {}
   auth.logout()
 }
 </script>
@@ -362,6 +381,7 @@ th, td {
   display: grid;
   row-gap: var(--space-md);
 }
+
 .site-footer {
   margin-top: 3rem;
   padding: 1.25rem 0;
@@ -384,5 +404,28 @@ th, td {
 .footer-link:visited {
   color: var(--text-dim);
   border-color: rgba(148,163,184,.35);
+}
+
+/* ------- Kundvagnsbadge ------- */
+.nav-links .cart-link {
+  position: relative;
+  padding-right: 2rem; /* plats för badge */
+}
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 .3rem;
+  border-radius: 999px;
+  background: #22c55e;
+  border: 1px solid rgba(255,255,255,.2);
+  display: inline-grid;
+  place-items: center;
+  font-size: .7rem;
+  font-weight: 700;
+  color: #0f172a;
+  box-shadow: 0 6px 16px rgba(34,197,94,.35);
 }
 </style>

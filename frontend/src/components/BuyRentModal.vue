@@ -8,8 +8,8 @@
           class="card-title"
           style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;"
         >
-          <span v-if="mode === 'buy'">Bekräfta köp</span>
-          <span v-else>Hyra spel</span>
+          <span v-if="mode === 'buy'">Lägg i kundvagn</span>
+          <span v-else>Hyra spel – lägg i kundvagn</span>
 
           <button
             class="btn"
@@ -59,7 +59,7 @@
               <span v-else>-</span>
             </div>
             <div class="card-sub" style="font-size:.75rem;">
-              När du bekräftar köpet så markeras spelet som "sold".
+              Varans status ändras först vid betalning i kassan.
             </div>
           </div>
         </div>
@@ -95,6 +95,9 @@
               <strong>Totalt för {{ months }} mån:</strong>
               {{ estimatedTotal }} kr
             </template>
+            <p class="card-sub" style="font-size:.75rem; margin:.25rem 0 0;">
+              Status ändras till <em>rented</em> först vid betalning i kassan.
+            </p>
           </div>
         </div>
 
@@ -111,13 +114,13 @@
       <div style="display:flex; flex-wrap:wrap; gap:.75rem; justify-content:flex-end;">
         <button
           class="btn primary"
-          style="min-width:120px; justify-content:center;"
+          style="min-width:160px; justify-content:center;"
           :disabled="loading"
-          @click="submitOrder"
+          @click="addToCart"
         >
-          <span v-if="!loading && mode==='buy'">Bekräfta köp</span>
-          <span v-else-if="!loading && mode==='rent'">Bekräfta hyra</span>
-          <span v-else>Sparar...</span>
+          <span v-if="!loading && mode==='buy'">Lägg i kundvagn</span>
+          <span v-else-if="!loading && mode==='rent'">Lägg i kundvagn</span>
+          <span v-else>Lägger till…</span>
         </button>
       </div>
     </div>
@@ -126,8 +129,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import api from '../api.js'
 import { useToastStore } from '../store/toast.js'
+import { useCartStore } from '../store/cart.js'
 
 const props = defineProps({
   game: { type: Object, required: true },
@@ -137,6 +140,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'done'])
 
 const toast = useToastStore()
+const cart = useCartStore()
 
 const loading = ref(false)
 const errMsg = ref('')
@@ -152,43 +156,83 @@ const estimatedTotal = computed(() => {
   return Number(props.game.price_rent_per_month) * Number(months.value)
 })
 
-async function submitOrder() {
+function validate() {
+  // köp måste ha säljpris
+  if (props.mode === 'buy') {
+    if (props.game.price_sell == null) {
+      errMsg.value = 'Det här spelet är inte till salu.'
+      return false
+    }
+    return true
+  }
+  // hyra måste ha månadspris + giltiga månader
+  if (props.mode === 'rent') {
+    if (props.game.price_rent_per_month == null) {
+      errMsg.value = 'Det här spelet går inte att hyra.'
+      return false
+    }
+    if (!months.value || months.value < 1) {
+      errMsg.value = 'Välj antal månader (minst 1).'
+      return false
+    }
+    return true
+  }
+  errMsg.value = 'Ogiltigt läge.'
+  return false
+}
+
+async function addToCart() {
   loading.value = true
   errMsg.value = ''
 
   try {
-    if (props.mode === 'buy') {
-      // KÖP
-      await api.post('/orders', {
-        gameId: props.game.id,
-        type: 'buy',
-      })
-      toast.push('✅ Köp genomfört! Kolla "Mina köp".', 'success')
-    } else {
-      // HYRA (per månad)
-      if (!months.value || months.value < 1) {
-        errMsg.value = 'Välj antal månader (minst 1).'
-        loading.value = false
-        return
-      }
-
-      await api.post('/orders', {
-        gameId: props.game.id,
-        type: 'rent',
-        rental_months: months.value,
-      })
-
-      toast.push('✅ Hyresorder skapad! Kolla "Mina köp".', 'success')
+    if (!validate()) {
+      loading.value = false
+      return
     }
 
-    // be parent refresha listan i Marknad
+    const base = {
+      gameId: props.game.id,
+      title: props.game.title,
+      platform: props.game.platform,
+      image_url: props.game.image_url || null,
+      owner_id: props.game.owner_id,
+      type: props.mode, // 'buy' | 'rent'
+    }
+
+    let item
+    if (props.mode === 'buy') {
+      item = {
+        ...base,
+        rental_months: null,
+        unit_price: Number(props.game.price_sell),
+        total_price: Number(props.game.price_sell),
+        // unik nyckel per game + typ
+        key: `${props.game.id}-buy`,
+      }
+    } else {
+      const m = Number(months.value)
+      item = {
+        ...base,
+        rental_months: m,
+        unit_price: Number(props.game.price_rent_per_month),
+        total_price: Number(props.game.price_rent_per_month) * m,
+        // unik nyckel per game + typ + månader
+        key: `${props.game.id}-rent-${m}`,
+      }
+    }
+
+    cart.addItem(item)
+    toast.push('✅ Tillagd i kundvagnen!', 'success')
+
+    // be parent refresha listan om du vill (valfritt)
     emit('done')
     // stäng modalen
     emit('close')
   } catch (err) {
     console.error(err)
-    errMsg.value = 'Kunde inte genomföra beställningen.'
-    toast.push('❌ Kunde inte genomföra beställningen', 'error')
+    errMsg.value = 'Kunde inte lägga i kundvagnen.'
+    toast.push('❌ Kunde inte lägga i kundvagnen', 'error')
   } finally {
     loading.value = false
   }
