@@ -46,6 +46,12 @@ export default {
 };
 </script>
 
+
+
+
+
+
+
 <style scoped>
 .game-info-container {
   max-width: 1000px;
