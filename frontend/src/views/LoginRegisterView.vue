@@ -87,6 +87,15 @@
             <p v-if="regErrors.password" class="err-msg">{{ regErrors.password }}</p>
           </div>
 
+         <label class="consent-row">
+          <input type="checkbox" v-model="regConsent" />
+          <span class="consent-text">
+            Jag samtycker till att mina personuppgifter behandlas enligt
+            <router-link to="/privacy" class="consent-link">integritetspolicyn</router-link>.
+          </span>
+        </label>
+        <p v-if="regErrors.consent" class="err-msg">{{ regErrors.consent }}</p>
+
           <button class="btn primary w-full-btn" type="submit">
             Skapa konto
           </button>
@@ -122,10 +131,12 @@ const loginErrors = ref({
 const regUsername = ref('')
 const regEmail = ref('')
 const regPassword = ref('')
+const regConsent = ref(false)
 const regErrors = ref({
   username: '',
   email: '',
   password: '',
+  consent: '',
 })
 
 function validateLogin() {
@@ -144,6 +155,7 @@ function validateLogin() {
 
 function validateRegister() {
   regErrors.value = { username: '', email: '', password: '' }
+  regErrors.value = { username: '', email: '', password: '', consent: '' }
   let ok = true
   if (!regUsername.value) {
     regErrors.value.username = 'Användarnamn krävs'
@@ -156,6 +168,9 @@ function validateRegister() {
   if (!regPassword.value) {
     regErrors.value.password = 'Lösenord krävs'
     ok = false
+  }
+  if (!regConsent.value) {
+    regErrors.value.consent = 'Du behöver samtycka till personuppgiftsbehandlingen'; ok = false
   }
   return ok
 }
@@ -184,6 +199,7 @@ async function handleRegister() {
     regUsername.value = ''
     regEmail.value = ''
     regPassword.value = ''
+    regConsent.value = false
   } catch (err) {
     console.error(err)
     toast.push('Registrering misslyckades', 'error')
@@ -266,5 +282,21 @@ async function handleRegister() {
 /* ta bort default extra spacing i card-header för just auth */
 .no-margin {
   margin-bottom: 0;
+}
+
+.consent-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  line-height: 1.4;
+}
+
+.consent-text { display: inline; }
+
+.consent-link,
+.consent-link:visited {
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 </style>

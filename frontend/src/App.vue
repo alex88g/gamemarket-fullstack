@@ -300,6 +300,7 @@ body {
 .input-group {
   display: grid;
   gap: .4rem;
+  margin-right: 1.5rem;
 }
 .input-label {
   font-size: .8rem;
@@ -427,5 +428,13 @@ th, td {
   font-weight: 700;
   color: #0f172a;
   box-shadow: 0 6px 16px rgba(34,197,94,.35);
+}
+
+.nav-btn.router-link-exact-active,
+.nav-btn.router-link-active {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent-hover);
+  font-weight: 600;
 }
 </style>
