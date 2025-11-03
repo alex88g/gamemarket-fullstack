@@ -34,6 +34,7 @@ import api from '../api.js'
 import GameCard from '../components/GameCard.vue'
 import BuyRentModal from '../components/BuyRentModal.vue'
 import { useToastStore } from '../store/toast.js'
+import { statusLabel, statusOptions } from '../utils/status.js'
 
 const games = ref([])
 const showModal = ref(false)
