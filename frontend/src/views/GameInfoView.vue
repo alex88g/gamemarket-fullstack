@@ -13,8 +13,8 @@
         <p class="genre">Genre: Action-Adventure</p>
         <p class="developer">Developer: Team Ico</p>
         <p class="description">
-          Embark on an epic journey across a vast, desolate land to bring a loved one back to life. 
-          Face off against towering colossi in one of the most visually and emotionally striking adventures 
+          Embark on an epic journey across a vast, desolate land to bring a loved one back to life.
+          Face off against towering colossi in one of the most visually and emotionally striking adventures
           on the PlayStation 2.
         </p>
         <div class="price-section">
@@ -28,12 +28,12 @@
     <div class="additional-info">
       <h2>About This Game</h2>
       <p>
-        "Shadow of the Colossus" is a critically acclaimed PlayStation 2 classic, known for its minimalist 
-        storytelling and emotional depth. Players take on the role of Wander, a young hero who must defeat 
+        "Shadow of the Colossus" is a critically acclaimed PlayStation 2 classic, known for its minimalist
+        storytelling and emotional depth. Players take on the role of Wander, a young hero who must defeat
         16 colossal beings to restore life to a fallen girl.
       </p>
       <p>
-        This is a placeholder page. Later, game information will be dynamically fetched from the MySQL 
+        This is a placeholder page. Later, game information will be dynamically fetched from the MySQL
         database using your backend API.
       </p>
     </div>

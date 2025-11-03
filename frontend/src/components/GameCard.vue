@@ -18,7 +18,7 @@
       </div>
 
       <span class="badge" :class="statusClass">
-        {{ game.status }}
+        {{ statusLabel(game.status) }}
       </span>
     </div>
 
@@ -73,6 +73,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { statusLabel } from '../utils/status.js'
 import { useAuthStore } from '../store/auth.js'
 
 const props = defineProps({
