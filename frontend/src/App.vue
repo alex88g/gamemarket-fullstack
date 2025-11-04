@@ -81,8 +81,12 @@
     <Toast />
 
     <footer class="site-footer">
-      <router-link to="/privacy" class="footer-link">Integritetspolicy (GDPR)</router-link>
-    </footer>
+  <nav class="footer-links">
+    <router-link to="/terms" class="footer-link">Allmänna villkor</router-link>
+    <span class="sep">•</span>
+    <router-link to="/privacy" class="footer-link">Integritetspolicy (GDPR)</router-link>
+  </nav>
+</footer>
   </div>
 </template>
 
@@ -391,13 +395,12 @@ th, td {
   color: var(--text-dim);
 }
 
-.footer-link {
-  color: var(--text-main);
-  text-decoration: none;
-  border-bottom: 1px dashed rgba(148,163,184,.35);
-  padding-bottom: 2px;
-  transition: color .15s ease, border-color .15s ease;
+.footer-links {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
 }
+.sep { opacity: .6; }
 .footer-link:hover {
   color: var(--text-main);
   border-color: var(--text-main);

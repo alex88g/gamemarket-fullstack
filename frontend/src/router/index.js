@@ -10,8 +10,9 @@ import MyListingsView from '../views/MyListingsView.vue'
 import MyOrdersView from '../views/MyOrdersView.vue'
 import AdminView from '../views/AdminView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
+import TermsView from '../views/TermsView.vue'
 import UserProfileView from '../views/UserProfileView.vue'
-import CartView from '../views/CartView.vue'   // <-- NY
+import CartView from '../views/CartView.vue'  
 
 const routes = [
   { path: '/', component: MarketplaceView },
@@ -20,8 +21,9 @@ const routes = [
   { path: '/orders', component: MyOrdersView },
   { path: '/admin', component: AdminView },
   { path: '/privacy', component: PrivacyView },
+  { path: '/terms', component: TermsView }, 
   { path: '/userProfile', component: UserProfileView },
-  { path: '/cart', component: CartView },     // <-- NY
+  { path: '/cart', component: CartView },     
   { path: '/game/:id', component: GameInfoView },
 ]
 

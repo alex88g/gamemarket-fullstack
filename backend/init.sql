@@ -87,7 +87,7 @@ VALUES
 (2, 'Marvel’s Spider-Man 2 (PS5)', 'PS5',
  'Svinga dig genom New York...', 749.00, 130.00, 'https://cdn.webhallen.com/images/product/362485?trim'),
 (1, 'God of War Ragnarök (PS5)', 'PS5',
- 'Kratos och Atreus...', 699.00, 120.00, 'https://cdn/webhallen.com/images/product/310508?trim'),
+ 'Kratos och Atreus...', 699.00, 120.00, 'https://cdn.webhallen.com/images/product/310508?trim'),
 (2, 'Elden Ring: Shadow of the Erdtree Edition (PS5)', 'PS5',
  'Utforska The Lands Between...', 749.00, 140.00, 'https://cdn.webhallen.com/images/product/369619?trim'),
 (1, 'Final Fantasy VII Rebirth (PS5)', 'PS5',

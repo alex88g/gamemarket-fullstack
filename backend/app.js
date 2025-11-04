@@ -10,6 +10,7 @@ import orderRoutes from './routes/orderRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import legalRoutes from './routes/legalRoutes.js'
 
 dotenv.config()
 
@@ -34,6 +35,7 @@ app.use('/api/orders', orderRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/user', userRoutes)
+app.use('/api/legal', legalRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() })

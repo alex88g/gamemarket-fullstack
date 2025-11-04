@@ -1,4 +1,5 @@
-<!-- src/views/PrivacyView.vue -->
+<!-- src/views/TermsView.vue -->
+<!-- src/views/TermsView.vue -->
 <template>
   <section class="legal-wrapper">
     <article class="card prose" v-html="html"></article>
@@ -23,12 +24,12 @@ function extractBody(doc) {
 
 onMounted(async () => {
   try {
-    const res = await api.get('/legal/privacy', { responseType: 'text' })
+    const res = await api.get('/legal/terms', { responseType: 'text' })
     html.value = extractBody(res.data)
-    document.title = 'Integritetspolicy – GameMarket'
+    document.title = 'Allmänna villkor – GameMarket'
     window.scrollTo(0, 0)
   } catch {
-    html.value = '<p>Kunde inte ladda integritetspolicyn.</p>'
+    html.value = '<p>Kunde inte ladda villkoren.</p>'
   }
 })
 </script>
@@ -42,3 +43,6 @@ onMounted(async () => {
 .prose :deep(ul) { margin: 0 0 1rem 1.25rem; }
 .prose :deep(a) { color: var(--accent-hover); text-decoration: underline; }
 </style>
+
+
+
