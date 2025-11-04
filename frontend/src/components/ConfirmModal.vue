@@ -5,9 +5,18 @@
       <h2 class="card-title">{{ title }}</h2>
       <p class="card-sub">{{ message }}</p>
 
-      <div style="display:flex; gap:.75rem; flex-wrap:wrap; justify-content:flex-end;">
+      <div
+        style="
+          display: flex;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        "
+      >
         <button class="btn" @click="$emit('cancel')">Avbryt</button>
-        <button class="btn danger" @click="$emit('confirm')">Ja, fortsätt</button>
+        <button class="btn danger" @click="$emit('confirm')">
+          Ja, fortsätt
+        </button>
       </div>
     </div>
   </div>
@@ -15,8 +24,8 @@
 
 <script setup>
 defineProps({
-  title: { type: String, default: 'Bekräfta' },
-  message: { type: String, default: 'Är du säker?' }
-})
-defineEmits(['confirm','cancel'])
+  title: { type: String, default: "Bekräfta" },
+  message: { type: String, default: "Är du säker?" },
+});
+defineEmits(["confirm", "cancel"]);
 </script>

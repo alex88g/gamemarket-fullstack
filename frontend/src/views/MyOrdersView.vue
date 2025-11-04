@@ -1,6 +1,6 @@
 <template>
-  <section class="row" style="gap:2rem;">
-    <header class="row" style="gap:.5rem;">
+  <section class="row" style="gap: 2rem">
+    <header class="row" style="gap: 0.5rem">
       <h1 class="card-title">Mina köp & hyror</h1>
       <p class="card-sub">Här ser du alla beställningar du gjort.</p>
     </header>
@@ -24,16 +24,19 @@
         <tbody>
           <tr v-for="o in orders" :key="o.id">
             <td>
-              <div style="font-weight:500; color:var(--text-main);">
+              <div style="font-weight: 500; color: var(--text-main)">
                 {{ o.gameTitle }}
               </div>
-              <div class="card-sub" style="font-size:.7rem;">
+              <div class="card-sub" style="font-size: 0.7rem">
                 {{ o.platform }}
               </div>
             </td>
 
             <td>
-              <span class="badge" :class="o.type === 'buy' ? 'success' : 'warn'">
+              <span
+                class="badge"
+                :class="o.type === 'buy' ? 'success' : 'warn'"
+              >
                 {{ o.type }}
               </span>
             </td>
@@ -56,33 +59,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import api from '../api.js'
-import { useAuthStore } from '../store/auth.js'
-import { useToastStore } from '../store/toast.js'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import api from "../api.js";
+import { useAuthStore } from "../store/auth.js";
+import { useToastStore } from "../store/toast.js";
 
-const auth = useAuthStore()
-const toast = useToastStore()
-const router = useRouter()
+const auth = useAuthStore();
+const toast = useToastStore();
+const router = useRouter();
 
-const orders = ref([])
+const orders = ref([]);
 
 async function loadOrders() {
   try {
-    const res = await api.get('/orders/me')
-    orders.value = res.data
+    const res = await api.get("/orders/me");
+    orders.value = res.data;
   } catch (err) {
-    console.error(err)
-    toast.push('Kunde inte hämta dina beställningar', 'error')
+    console.error(err);
+    toast.push("Kunde inte hämta dina beställningar", "error");
   }
 }
 
 onMounted(() => {
   if (!auth.isLoggedIn) {
-    router.push('/login')
-    return
+    router.push("/login");
+    return;
   }
-  loadOrders()
-})
+  loadOrders();
+});
 </script>

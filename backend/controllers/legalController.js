@@ -107,7 +107,7 @@ export function getTerms(req, res) {
 
     <p><em>Denna text är en mall och ersätter inte juridisk rådgivning.</em></p>
   `;
-  res.type('html').send(htmlShell('Allmänna villkor – GameMarket', body));
+  res.type("html").send(htmlShell("Allmänna villkor – GameMarket", body));
 }
 
 export function getPrivacy(req, res) {
@@ -127,5 +127,5 @@ export function getPrivacy(req, res) {
 
     <p>Har du klagomål kan du kontakta Integritetsskyddsmyndigheten (IMY).</p>
   `;
-  res.type('html').send(htmlShell('Integritetspolicy – GameMarket', body));
+  res.type("html").send(htmlShell("Integritetspolicy – GameMarket", body));
 }

@@ -1,19 +1,19 @@
 // middleware/auth.js
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 dotenv.config();
 
 export function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: 'No token' });
+  if (!authHeader) return res.status(401).json({ message: "No token" });
 
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // { id, username, role }
     next();
   } catch (err) {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ message: "Invalid token", error: err  });
   }
 }
 
@@ -22,15 +22,15 @@ export function requireOwnerOrAdmin(req, res, next) {
   const { role, id: userId } = req.user;
   const { ownerId } = req; // vi lägger detta i controller när vi laddat spelet
 
-  if (role === 'admin' || userId === ownerId) {
+  if (role === "admin" || userId === ownerId) {
     return next();
   }
-  return res.status(403).json({ message: 'Forbidden' });
+  return res.status(403).json({ message: "Forbidden" });
 }
 
 export function requireAdmin(req, res, next) {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Admins only' });
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admins only" });
   }
   next();
 }
