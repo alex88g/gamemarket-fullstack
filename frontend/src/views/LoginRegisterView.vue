@@ -88,12 +88,15 @@
           </div>
 
          <label class="consent-row">
-          <input type="checkbox" v-model="regConsent" />
-          <span class="consent-text">
-            Jag samtycker till att mina personuppgifter behandlas enligt
-            <router-link to="/privacy" class="consent-link">integritetspolicyn</router-link>.
-          </span>
-        </label>
+  <input type="checkbox" v-model="regConsent" />
+  <span class="consent-text">
+    Jag samtycker till
+    <router-link to="/terms" class="consent-link">allmänna villkor</router-link>
+    och
+    <router-link to="/privacy" class="consent-link">integritetspolicyn</router-link>.
+  </span>
+</label>
+
         <p v-if="regErrors.consent" class="err-msg">{{ regErrors.consent }}</p>
 
           <button class="btn primary w-full-btn" type="submit">
