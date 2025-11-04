@@ -34,16 +34,15 @@
       </div>
       <div class="card-sub">
         <strong>Hyr per månad:</strong>
-        <span v-if="game.price_rent_per_month != null">{{ game.price_rent_per_month }} kr</span>
+        <span v-if="game.price_rent_per_month != null"
+          >{{ game.price_rent_per_month }} kr</span
+        >
         <span v-else>-</span>
       </div>
     </div>
 
     <!-- knappar -->
-    <div
-      v-if="!isOwner && isLoggedIn"
-      class="actions-row"
-    >
+    <div v-if="!isOwner && isLoggedIn" class="actions-row">
       <button
         v-if="game.price_sell != null && game.status === 'available'"
         class="btn primary"
@@ -61,46 +60,48 @@
       </button>
     </div>
 
-    <div
-      v-else-if="isOwner"
-      class="card-sub"
-      style="font-size:.7rem;"
-    >
+    <div v-else-if="isOwner" class="card-sub" style="font-size: 0.7rem">
       (Detta är ditt spel)
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { statusLabel } from '../utils/status.js'
-import { useAuthStore } from '../store/auth.js'
+import { computed } from "vue";
+import { statusLabel } from "../utils/status.js";
+import { useAuthStore } from "../store/auth.js";
 
 const props = defineProps({
-  game: { type: Object, required: true }
-})
+  game: { type: Object, required: true },
+});
 
-const auth = useAuthStore()
+const auth = useAuthStore();
 
-const isLoggedIn = computed(() => auth.isLoggedIn)
-const isOwner = computed(() => auth.user?.id === props.game.owner_id)
+const isLoggedIn = computed(() => auth.isLoggedIn);
+const isOwner = computed(() => auth.user?.id === props.game.owner_id);
 
 const statusClass = computed(() => {
   switch (props.game.status) {
-    case 'available': return 'success'
-    case 'reserved': return 'warn'
-    case 'rented':   return 'warn'
-    case 'sold':     return 'danger'
-    case 'blocked':  return 'danger'
-    default:         return ''
+    case "available":
+      return "success";
+    case "reserved":
+      return "warn";
+    case "rented":
+      return "warn";
+    case "sold":
+      return "danger";
+    case "blocked":
+      return "danger";
+    default:
+      return "";
   }
-})
+});
 </script>
 
 <style scoped>
 .game-card {
   display: grid;
-  row-gap: .75rem;
+  row-gap: 0.75rem;
 }
 
 /* översta raden i kortet */
@@ -108,7 +109,7 @@ const statusClass = computed(() => {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: .75rem;
+  gap: 0.75rem;
   justify-content: space-between;
 }
 
@@ -121,7 +122,7 @@ const statusClass = computed(() => {
 .game-thumb {
   width: 80px;
   height: 80px;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   object-fit: cover;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
@@ -129,13 +130,13 @@ const statusClass = computed(() => {
 
 /* prisraden får lite mindre gap i kortet */
 .prices-row {
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
 /* knapprow */
 .actions-row {
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 </style>

@@ -34,7 +34,8 @@
               v-if="cart.count > 0"
               class="cart-badge"
               aria-label="Antal varor i kundvagnen"
-            >{{ cart.count }}</span>
+              >{{ cart.count }}</span
+            >
           </router-link>
 
           <router-link
@@ -46,11 +47,7 @@
           </router-link>
 
           <!-- Visa bara för admin -->
-          <router-link
-            v-if="isAdmin"
-            to="/admin"
-            class="nav-btn admin"
-          >
+          <router-link v-if="isAdmin" to="/admin" class="nav-btn admin">
             Admin
           </router-link>
 
@@ -63,11 +60,7 @@
             Logga in
           </router-link>
 
-          <button
-            v-else
-            class="nav-btn danger"
-            @click="logout"
-          >
+          <button v-else class="nav-btn danger" @click="logout">
             Logga ut ({{ auth.user?.username }})
           </button>
         </div>
@@ -81,30 +74,38 @@
     <Toast />
 
     <footer class="site-footer">
-  <nav class="footer-links">
-    <router-link to="/terms" class="footer-link">Allmänna villkor</router-link>
-    <span class="sep">•</span>
-    <router-link to="/privacy" class="footer-link">Integritetspolicy (GDPR)</router-link>
-  </nav>
-</footer>
+      <nav class="footer-links">
+        <router-link to="/terms" class="footer-link"
+          >Allmänna villkor</router-link
+        >
+        <span class="sep">•</span>
+        <router-link to="/privacy" class="footer-link"
+          >Integritetspolicy (GDPR)</router-link
+        >
+      </nav>
+    </footer>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useAuthStore } from './store/auth.js'
-import { useCartStore } from './store/cart.js'
-import Toast from './components/Toast.vue'
+import { computed } from "vue";
+import { useAuthStore } from "./store/auth.js";
+import { useCartStore } from "./store/cart.js";
+import Toast from "./components/Toast.vue";
 
-const auth = useAuthStore()
-const cart = useCartStore()
+const auth = useAuthStore();
+const cart = useCartStore();
 
-const isAdmin = computed(() => auth.user?.role === 'admin')
+const isAdmin = computed(() => auth.user?.role === "admin");
 
 function logout() {
   // Valfritt: töm kundvagn vid utloggning
-  try { cart.clear() } catch {}
-  auth.logout()
+  try {
+    cart.clear();
+  } catch (err) {
+    console.error("Logout failed", err);
+  }
+  auth.logout();
 }
 </script>
 
@@ -118,23 +119,30 @@ function logout() {
   --accent-hover: #6366f1;
   --danger: #dc2626;
   --radius-lg: 1rem;
-  --radius-sm: .5rem;
-  --border-color: rgba(255,255,255,0.08);
-  --shadow-card: 0 24px 48px rgba(0,0,0,0.6);
-  --shadow-pop: 0 20px 40px rgba(0,0,0,0.8);
+  --radius-sm: 0.5rem;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --shadow-card: 0 24px 48px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 20px 40px rgba(0, 0, 0, 0.8);
   --space-xl: 2rem;
   --space-lg: 1.25rem;
-  --space-md: .75rem;
-  --space-sm: .5rem;
+  --space-md: 0.75rem;
+  --space-sm: 0.5rem;
   --font-size-title: 1.1rem;
-  --font-size-body: .95rem;
+  --font-size-body: 0.95rem;
 }
 
 body {
   margin: 0;
   background: var(--bg-body);
   color: var(--text-main);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, "Segoe UI", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Inter",
+    Roboto,
+    "Segoe UI",
+    sans-serif;
 }
 
 .layout {
@@ -145,7 +153,7 @@ body {
 
 .navbar {
   border-bottom: 1px solid var(--border-color);
-  background: rgba(15,23,42,0.6);
+  background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
@@ -181,8 +189,8 @@ body {
   background: transparent;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: .5rem .75rem;
-  font-size: .8rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-main);
   text-decoration: none;
   cursor: pointer;
@@ -198,21 +206,21 @@ body {
 }
 
 .nav-btn.danger {
-  border-color: rgba(220,38,38,.4);
+  border-color: rgba(220, 38, 38, 0.4);
   color: #fff;
 }
 .nav-btn.danger:hover {
-  background: rgba(220,38,38,.15);
-  border-color: rgba(220,38,38,.6);
+  background: rgba(220, 38, 38, 0.15);
+  border-color: rgba(220, 38, 38, 0.6);
 }
 
 .nav-btn.admin {
   color: #fde047;
-  border-color: rgba(253,224,71,.4);
+  border-color: rgba(253, 224, 71, 0.4);
 }
 .nav-btn.admin:hover {
-  background: rgba(253,224,71,.1);
-  border-color: rgba(253,224,71,.6);
+  background: rgba(253, 224, 71, 0.1);
+  border-color: rgba(253, 224, 71, 0.6);
 }
 
 .page-wrapper {
@@ -251,7 +259,7 @@ body {
 
 .card-sub {
   color: var(--text-dim);
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .row {
@@ -264,7 +272,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: var(--space-md);
 }
-@media(max-width:700px){
+@media (max-width: 700px) {
   .row-2col {
     grid-template-columns: 1fr;
   }
@@ -275,8 +283,8 @@ body {
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   border-radius: var(--radius-sm);
-  font-size: .8rem;
-  padding: .5rem .75rem;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
   color: var(--text-main);
   cursor: pointer;
   line-height: 1.2;
@@ -290,12 +298,12 @@ body {
   border-color: var(--accent-hover);
 }
 .btn.danger {
-  border-color: rgba(220,38,38,.4);
+  border-color: rgba(220, 38, 38, 0.4);
   color: #fff;
 }
 .btn.danger:hover {
-  background: rgba(220,38,38,.15);
-  border-color: rgba(220,38,38,.6);
+  background: rgba(220, 38, 38, 0.15);
+  border-color: rgba(220, 38, 38, 0.6);
 }
 .btn.outline {
   background: transparent;
@@ -303,11 +311,11 @@ body {
 
 .input-group {
   display: grid;
-  gap: .4rem;
+  gap: 0.4rem;
   margin-right: 1.5rem;
 }
 .input-label {
-  font-size: .8rem;
+  font-size: 0.8rem;
   color: var(--text-main);
   font-weight: 500;
 }
@@ -316,14 +324,14 @@ body {
   background: #0f172a;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
-  padding: .6rem .7rem;
-  font-size: .9rem;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.9rem;
   color: var(--text-main);
   outline: none;
 }
 .input-field:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(99,102,241,.3);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
 }
 
 .table-wrapper {
@@ -332,46 +340,47 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: .85rem;
+  font-size: 0.85rem;
 }
 th {
   text-align: left;
   font-weight: 500;
   color: var(--text-main);
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
-th, td {
-  padding: .6rem .75rem;
+th,
+td {
+  padding: 0.6rem 0.75rem;
   border-bottom: 1px solid var(--border-color);
   vertical-align: top;
 }
 .badge {
-  font-size: .7rem;
+  font-size: 0.7rem;
   line-height: 1.2;
   border-radius: var(--radius-sm);
-  padding: .3rem .5rem;
+  padding: 0.3rem 0.5rem;
   border: 1px solid var(--border-color);
 }
 .badge.success {
-  background: rgba(16,185,129,.15);
-  border-color: rgba(16,185,129,.5);
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.5);
   color: #6ee7b7;
 }
 .badge.warn {
-  background: rgba(253,224,71,.1);
-  border-color: rgba(253,224,71,.4);
+  background: rgba(253, 224, 71, 0.1);
+  border-color: rgba(253, 224, 71, 0.4);
   color: #fde047;
 }
 .badge.danger {
-  background: rgba(220,38,38,.15);
-  border-color: rgba(220,38,38,.6);
+  background: rgba(220, 38, 38, 0.15);
+  border-color: rgba(220, 38, 38, 0.6);
   color: #fecaca;
 }
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.6);
+  background: rgba(0, 0, 0, 0.6);
   display: grid;
   place-items: center;
   z-index: 999;
@@ -382,7 +391,7 @@ th, td {
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-pop);
   padding: var(--space-lg);
-  width: min(400px,90vw);
+  width: min(400px, 90vw);
   display: grid;
   row-gap: var(--space-md);
 }
@@ -398,16 +407,18 @@ th, td {
 .footer-links {
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
+  gap: 0.5rem;
 }
-.sep { opacity: .6; }
+.sep {
+  opacity: 0.6;
+}
 .footer-link:hover {
   color: var(--text-main);
   border-color: var(--text-main);
 }
 .footer-link:visited {
   color: var(--text-dim);
-  border-color: rgba(148,163,184,.35);
+  border-color: rgba(148, 163, 184, 0.35);
 }
 
 /* ------- Kundvagnsbadge ------- */
@@ -421,19 +432,18 @@ th, td {
   right: -8px;
   min-width: 1.25rem;
   height: 1.25rem;
-  padding: 0 .3rem;
+  padding: 0 0.3rem;
   border-radius: 999px;
   background: #22c55e;
-  border: 1px solid rgba(255,255,255,.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: inline-grid;
   place-items: center;
-  font-size: .7rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #0f172a;
-  box-shadow: 0 6px 16px rgba(34,197,94,.35);
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
 }
 
-.nav-btn.router-link-exact-active,
 .nav-btn.router-link-active {
   border-color: var(--accent);
   background: rgba(99, 102, 241, 0.15);

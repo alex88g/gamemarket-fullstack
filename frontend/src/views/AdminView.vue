@@ -1,8 +1,7 @@
 <!-- src/views/AdminView.vue -->
 <template>
-  <section class="row" style="gap:2rem;">
-
-    <header class="row" style="gap:.5rem;">
+  <section class="row" style="gap: 2rem">
+    <header class="row" style="gap: 0.5rem">
       <h1 class="card-title">Adminpanel</h1>
       <p class="card-sub">
         Endast admin. Moderera annonser och se alla ordrar.
@@ -18,9 +17,10 @@
     <template v-else>
       <!-- ANNONSER / MODERERING -->
       <div class="card table-wrapper">
-        <h2 class="card-title" style="margin-top:0;">Annonser (moderering)</h2>
-        <p class="card-sub" style="margin-bottom:1rem;">
-          Blockera olämpliga annonser. Blockerade annonser syns inte på marknaden.
+        <h2 class="card-title" style="margin-top: 0">Annonser (moderering)</h2>
+        <p class="card-sub" style="margin-bottom: 1rem">
+          Blockera olämpliga annonser. Blockerade annonser syns inte på
+          marknaden.
         </p>
 
         <table>
@@ -40,32 +40,32 @@
             <tr v-for="g in allGames" :key="g.id">
               <td>#{{ g.id }}</td>
 
-              <td style="min-width:160px;">
-                <div style="font-weight:500; color:var(--text-main);">
+              <td style="min-width: 160px">
+                <div style="font-weight: 500; color: var(--text-main)">
                   {{ g.title }}
                 </div>
-                <div class="card-sub" style="font-size:.7rem;">
+                <div class="card-sub" style="font-size: 0.7rem">
                   {{ g.platform }}
                 </div>
               </td>
 
-              <td style="min-width:120px;">
-                <div style="font-weight:500; color:var(--text-main);">
+              <td style="min-width: 120px">
+                <div style="font-weight: 500; color: var(--text-main)">
                   {{ g.ownerName }}
                 </div>
-                <div class="card-sub" style="font-size:.7rem;">
+                <div class="card-sub" style="font-size: 0.7rem">
                   owner_id: {{ g.owner_id }}
                 </div>
               </td>
 
               <td>
                 <span class="badge" :class="badgeClass(g.status)">
-                  {{ g.status }}
+                  {{ statusLabel(g.status) }}
                 </span>
               </td>
 
-              <td>{{ g.price_sell ?? '-' }} kr</td>
-              <td>{{ g.price_rent_per_month ?? '-' }} kr</td>
+              <td>{{ g.price_sell ?? "-" }} kr</td>
+              <td>{{ g.price_rent_per_month ?? "-" }} kr</td>
 
               <td>
                 <img
@@ -73,20 +73,27 @@
                   :src="g.image_url"
                   :alt="g.title"
                   style="
-                    width:60px;
-                    height:60px;
-                    object-fit:cover;
-                    border-radius:.5rem;
-                    border:1px solid var(--border-color);
+                    width: 60px;
+                    height: 60px;
+                    object-fit: cover;
+                    border-radius: 0.5rem;
+                    border: 1px solid var(--border-color);
                   "
                 />
               </td>
 
-              <td style="min-width:140px; display:flex; flex-wrap:wrap; gap:.5rem;">
+              <td
+                style="
+                  min-width: 140px;
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 0.5rem;
+                "
+              >
                 <button
                   v-if="g.status !== 'blocked'"
                   class="btn danger"
-                  style="font-size:.7rem;"
+                  style="font-size: 0.7rem"
                   @click="blockGame(g)"
                 >
                   Blockera
@@ -95,7 +102,7 @@
                 <button
                   v-else
                   class="btn primary"
-                  style="font-size:.7rem;"
+                  style="font-size: 0.7rem"
                   @click="unblockGame(g)"
                 >
                   Tillåt igen
@@ -108,8 +115,8 @@
 
       <!-- ALLA ORDRAR -->
       <div class="card table-wrapper">
-        <h2 class="card-title" style="margin-top:0;">Alla ordrar</h2>
-        <p class="card-sub" style="margin-bottom:1rem;">
+        <h2 class="card-title" style="margin-top: 0">Alla ordrar</h2>
+        <p class="card-sub" style="margin-bottom: 1rem">
           Köphistorik & hyror i hela systemet.
         </p>
 
@@ -130,25 +137,28 @@
               <td>#{{ o.id }}</td>
 
               <td>
-                <div style="font-weight:500;color:var(--text-main);">
+                <div style="font-weight: 500; color: var(--text-main)">
                   {{ o.buyerName }}
                 </div>
-                <div class="card-sub" style="font-size:.7rem;">
+                <div class="card-sub" style="font-size: 0.7rem">
                   id: {{ o.buyer_id }}
                 </div>
               </td>
 
               <td>
-                <div style="font-weight:500; color:var(--text-main);">
+                <div style="font-weight: 500; color: var(--text-main)">
                   {{ o.gameTitle }}
                 </div>
-                <div class="card-sub" style="font-size:.7rem;">
+                <div class="card-sub" style="font-size: 0.7rem">
                   gameId: {{ o.game_id }}
                 </div>
               </td>
 
               <td>
-                <span class="badge" :class="o.type === 'buy' ? 'success':'warn'">
+                <span
+                  class="badge"
+                  :class="o.type === 'buy' ? 'success' : 'warn'"
+                >
                   {{ o.type }}
                 </span>
               </td>
@@ -172,76 +182,83 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import api from '../api.js'
-import { useAuthStore } from '../store/auth.js'
-import { useToastStore } from '../store/toast.js'
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import api from "../api.js";
+import { useAuthStore } from "../store/auth.js";
+import { useToastStore } from "../store/toast.js";
+import { statusLabel } from "../utils/status.js";
 
-const auth = useAuthStore()
-const toast = useToastStore()
-const router = useRouter()
+const auth = useAuthStore();
+const toast = useToastStore();
+const router = useRouter();
 
-const allGames = ref([])
-const allOrders = ref([])
+const allGames = ref([]);
+const allOrders = ref([]);
 
-const isAdmin = computed(() => auth.user?.role === 'admin')
+const isAdmin = computed(() => auth.user?.role === "admin");
 
 function badgeClass(status) {
   switch (status) {
-    case 'available': return 'success'
-    case 'reserved': return 'warn'
-    case 'rented': return 'warn'
-    case 'sold': return 'danger'
-    case 'blocked': return 'danger'
-    default: return ''
+    case "available":
+      return "success";
+    case "reserved":
+      return "warn";
+    case "rented":
+      return "warn";
+    case "sold":
+      return "danger";
+    case "blocked":
+      return "danger";
+    default:
+      return "";
   }
 }
 
 async function loadAdminData() {
   try {
     const [gamesRes, ordersRes] = await Promise.all([
-      api.get('/admin/games'),
-      api.get('/admin/orders'),
-    ])
-    allGames.value = gamesRes.data
-    allOrders.value = ordersRes.data
+      api.get("/admin/games"),
+      api.get("/admin/orders"),
+    ]);
+    allGames.value = gamesRes.data;
+    allOrders.value = ordersRes.data;
   } catch (err) {
-    console.error(err)
-    toast.push('Kunde inte ladda admin-data', 'error')
+    console.error(err);
+    toast.push("Kunde inte ladda admin-data", "error");
   }
 }
 
 async function blockGame(g) {
   try {
-    await api.put(`/admin/games/${g.id}`, { status: 'blocked' })
-    toast.push(`Annons ${g.id} blockerad`, 'success')
-    await loadAdminData()
+    await api.put(`/admin/games/${g.id}`, { status: "blocked" });
+    toast.push(`Annons ${g.id} blockerad`, "success");
+    await loadAdminData();
   } catch (err) {
-    console.error(err)
-    toast.push('Kunde inte blockera annons', 'error')
+    console.error(err);
+    toast.push("Kunde inte blockera annons", "error");
   }
 }
 
 async function unblockGame(g) {
   try {
-    await api.put(`/admin/games/${g.id}`, { status: 'available' })
-    toast.push(`Annons ${g.id} upplåst`, 'success')
-    await loadAdminData()
+    await api.put(`/admin/games/${g.id}`, { status: "available" });
+    toast.push(`Annons ${g.id} upplåst`, "success");
+    await loadAdminData();
   } catch (err) {
-    console.error(err)
-    toast.push('Kunde inte låsa upp annons', 'error')
+    console.error(err);
+    toast.push("Kunde inte låsa upp annons", "error");
   }
 }
 
 onMounted(() => {
   if (!auth.isLoggedIn) {
-    router.push('/login')
-    return
+    router.push("/login");
+    return;
   }
   if (!isAdmin.value) {
-    return
+    return;
   }
-  loadAdminData()
-})
+  loadAdminData();
+});
 </script>

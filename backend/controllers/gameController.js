@@ -1,5 +1,5 @@
 // backend/controllers/gameController.js
-import { pool } from '../db.js';
+import { pool } from "../db.js";
 
 // Hämta alla spel
 export async function getAllGames(req, res) {
@@ -8,12 +8,12 @@ export async function getAllGames(req, res) {
       `SELECT g.*, u.username AS "ownerName"
        FROM games g
        JOIN users u ON u.id = g.owner_id
-       ORDER BY g.created_at DESC`
+       ORDER BY g.created_at DESC`,
     );
     return res.json(rows);
   } catch (err) {
-    console.error('getAllGames error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("getAllGames error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 }
 
@@ -25,15 +25,15 @@ export async function getGameById(req, res) {
        FROM games g
        JOIN users u ON u.id = g.owner_id
        WHERE g.id = $1`,
-      [req.params.id]
+      [req.params.id],
     );
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'Not found' });
+      return res.status(404).json({ message: "Not found" });
     }
     return res.json(rows[0]);
   } catch (err) {
-    console.error('getGameById error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("getGameById error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 }
 
@@ -47,7 +47,7 @@ export async function createGame(req, res) {
       description,
       price_sell,
       price_rent_per_month,
-      image_url
+      image_url,
     } = req.body;
 
     const { rows } = await pool.query(
@@ -58,18 +58,18 @@ export async function createGame(req, res) {
       [
         ownerId,
         title,
-        platform || 'Other',
-        description || '',
+        platform || "Other",
+        description || "",
         price_sell ?? null,
         price_rent_per_month ?? null,
-        image_url ?? null
-      ]
+        image_url ?? null,
+      ],
     );
 
     return res.status(201).json(rows[0]);
   } catch (err) {
-    console.error('createGame error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("createGame error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 }
 
@@ -78,15 +78,17 @@ export async function updateGame(req, res) {
   try {
     const gameId = req.params.id;
 
-    const { rows } = await pool.query('SELECT * FROM games WHERE id = $1', [gameId]);
+    const { rows } = await pool.query("SELECT * FROM games WHERE id = $1", [
+      gameId,
+    ]);
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'Not found' });
+      return res.status(404).json({ message: "Not found" });
     }
     const game = rows[0];
 
     const { role, id: userId } = req.user;
-    if (!(role === 'admin' || userId === game.owner_id)) {
-      return res.status(403).json({ message: 'Forbidden' });
+    if (!(role === "admin" || userId === game.owner_id)) {
+      return res.status(403).json({ message: "Forbidden" });
     }
 
     const {
@@ -96,7 +98,7 @@ export async function updateGame(req, res) {
       price_sell,
       price_rent_per_month,
       status,
-      image_url
+      image_url,
     } = req.body;
 
     await pool.query(
@@ -117,14 +119,14 @@ export async function updateGame(req, res) {
         price_rent_per_month ?? game.price_rent_per_month,
         status ?? game.status,
         image_url ?? game.image_url,
-        gameId
-      ]
+        gameId,
+      ],
     );
 
-    return res.json({ message: 'Game updated' });
+    return res.json({ message: "Game updated" });
   } catch (err) {
-    console.error('updateGame error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("updateGame error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 }
 
@@ -133,22 +135,24 @@ export async function deleteGame(req, res) {
   try {
     const gameId = req.params.id;
 
-    const { rows } = await pool.query('SELECT * FROM games WHERE id = $1', [gameId]);
+    const { rows } = await pool.query("SELECT * FROM games WHERE id = $1", [
+      gameId,
+    ]);
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'Not found' });
+      return res.status(404).json({ message: "Not found" });
     }
     const game = rows[0];
 
     const { role, id: userId } = req.user;
-    if (!(role === 'admin' || userId === game.owner_id)) {
-      return res.status(403).json({ message: 'Forbidden' });
+    if (!(role === "admin" || userId === game.owner_id)) {
+      return res.status(403).json({ message: "Forbidden" });
     }
 
-    await pool.query('DELETE FROM games WHERE id = $1', [gameId]);
+    await pool.query("DELETE FROM games WHERE id = $1", [gameId]);
 
-    return res.json({ message: 'Game deleted' });
+    return res.json({ message: "Game deleted" });
   } catch (err) {
-    console.error('deleteGame error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("deleteGame error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 }
