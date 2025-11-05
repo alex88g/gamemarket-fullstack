@@ -1,79 +1,70 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-white p-8">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10">
-      <h1 class="text-4xl font-bold tracking-tight mb-4 md:mb-0">🎮 Game Dashboard</h1>
-      <div class="flex gap-4">
-        <div class="bg-gray-800/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md text-center">
-          <p class="text-sm text-gray-400">Total Games</p>
-          <p class="text-xl font-semibold text-emerald-400">{{ games.length }}</p>
-        </div>
-        <div class="bg-gray-800/70 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md text-center">
-          <p class="text-sm text-gray-400">Avg Rating</p>
-          <p class="text-xl font-semibold text-emerald-400">{{ avgRating.toFixed(1) }}</p>
-        </div>
-      </div>
-    </div>
+  <div class="dashboard">
+    <header class="header">
+      <h1>🧭 Fantasy Game Analytics</h1>
+      <p>Explore realms, player growth, and ratings across the multiverse.</p>
+    </header>
 
-    <!-- Game Grid -->
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <div
-        v-for="game in games"
-        :key="game.id"
-        class="bg-gray-900/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex flex-col"
-      >
-        <img
-          :src="game.image"
-          :alt="game.name"
-          class="w-full h-48 object-cover"
-        />
+    <!-- Game Cards -->
+    <section class="cards">
+      <div class="card" v-for="game in games" :key="game.id">
+        <img :src="game.image" :alt="game.name" class="card-image" />
 
-        <div class="p-5 flex flex-col flex-1">
-          <h2 class="text-xl font-semibold mb-1">{{ game.name }}</h2>
-          <p class="text-sm text-gray-400 mb-3">
-            {{ game.genre }} • {{ game.platform }}
+        <div class="card-content">
+          <h2 class="game-title">{{ game.name }}</h2>
+          <p class="meta">{{ game.genre }} • {{ game.platform }}</p>
+          <p class="rating">Rating: <strong>{{ game.rating }}/10</strong></p>
+          <p class="players">
+            Players: {{ game.stats[game.stats.length - 1].value.toLocaleString() }}
           </p>
 
-          <!-- Rating -->
-          <div class="flex items-center justify-between mb-4">
-            <span class="text-sm text-gray-400">Rating</span>
-            <span
-              class="font-bold text-lg"
-              :class="{
-                'text-emerald-400': game.rating >= 9,
-                'text-yellow-400': game.rating < 9 && game.rating >= 7,
-                'text-red-400': game.rating < 7,
-              }"
-            >
-              {{ game.rating }}/10
-            </span>
-          </div>
-
-          <!-- Manual “chart” -->
-          <div class="relative bg-gray-800 rounded-lg p-3 h-32 flex items-end justify-between overflow-hidden">
-            <!-- Gradient glow -->
-            <div class="absolute inset-0 bg-gradient-to-t from-gray-800 to-transparent opacity-40 pointer-events-none"></div>
-
+          <!-- Chart without labels -->
+          <div class="chart">
             <div
               v-for="point in game.stats"
               :key="point.month"
-              class="flex flex-col items-center flex-1 mx-1 z-10"
+              class="chart-bar"
             >
               <div
-                class="w-3 rounded-t bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-lg"
-                :style="{ height: `${(point.value / maxStatValue) * 100}%` }"
+                class="chart-fill"
+                :style="{ height: (point.value / maxStatValue) * 100 + '%' }"
               ></div>
-              <span class="text-[10px] text-gray-400 mt-1">{{ point.month }}</span>
             </div>
-          </div>
-
-          <!-- Small summary -->
-          <div class="text-xs text-gray-500 text-right mt-2">
-            ↑ {{ game.stats[game.stats.length - 1].value }} active players
           </div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="stats">
+      <h3>📊 Global Realm Insights</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Avg Players</th>
+            <th>Peak Month</th>
+            <th>Growth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="game in games" :key="game.name">
+            <td>{{ game.name }}</td>
+            <td>{{ avg(game.stats).toLocaleString() }}</td>
+            <td>{{ peakMonth(game.stats) }}</td>
+            <td>
+              <div class="growth-bar">
+                <div
+                  class="growth-fill"
+                  :style="{ width: growth(game.stats).toFixed(1) + '%' }"
+                ></div>
+                <span>{{ growth(game.stats).toFixed(1) }}%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </div>
 </template>
 
@@ -85,30 +76,29 @@ const games = [
     genre: "Action RPG",
     platform: "PC / PS5",
     rating: 9.2,
-    image:
-      "https://images.unsplash.com/photo-1606813902735-86c4d7daea4d?auto=format&fit=crop&w=800&q=80",
+    image: "https://cdn.mos.cms.futurecdn.net/MQKqAyj3Un8CFMWtwzEEmX-1200-80.jpg",
     stats: [
-      { month: "Jan", value: 800 },
-      { month: "Feb", value: 1000 },
-      { month: "Mar", value: 1200 },
-      { month: "Apr", value: 1100 },
-      { month: "May", value: 1400 },
+      { month: "Jan", value: 820 },
+      { month: "Feb", value: 1040 },
+      { month: "Mar", value: 1280 },
+      { month: "Apr", value: 1160 },
+      { month: "May", value: 1480 },
     ],
   },
   {
     id: 2,
     name: "Star Dominion",
-    genre: "Strategy",
+    genre: "4X Strategy",
     platform: "PC / Xbox",
     rating: 8.7,
     image:
-      "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
+      "https://cdn1.epicgames.com/offer/7a2f74a6a5f141fc910c879d2c891a62/EGS_Homeworld3_BlackbirdInteractive_S1_2560x1440-8a4b3c51a20e75e19e14b6c146ed20c2",
     stats: [
-      { month: "Jan", value: 500 },
-      { month: "Feb", value: 700 },
-      { month: "Mar", value: 650 },
-      { month: "Apr", value: 900 },
-      { month: "May", value: 950 },
+      { month: "Jan", value: 580 },
+      { month: "Feb", value: 720 },
+      { month: "Mar", value: 690 },
+      { month: "Apr", value: 920 },
+      { month: "May", value: 980 },
     ],
   },
   {
@@ -118,60 +108,181 @@ const games = [
     platform: "PC",
     rating: 9.0,
     image:
-      "https://images.unsplash.com/photo-1627856014977-44f5f0df75f1?auto=format&fit=crop&w=800&q=80",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/233860/header.jpg",
     stats: [
-      { month: "Jan", value: 1200 },
-      { month: "Feb", value: 1300 },
-      { month: "Mar", value: 1250 },
-      { month: "Apr", value: 1500 },
-      { month: "May", value: 1600 },
+      { month: "Jan", value: 1220 },
+      { month: "Feb", value: 1320 },
+      { month: "Mar", value: 1270 },
+      { month: "Apr", value: 1540 },
+      { month: "May", value: 1650 },
     ],
   },
   {
     id: 4,
-    name: "Solar Strikers",
-    genre: "Sci-Fi Shooter",
-    platform: "PS5 / Xbox",
-    rating: 8.5,
-    image:
-      "https://images.unsplash.com/photo-1635323718990-5d2c5e3bfc5b?auto=format&fit=crop&w=800&q=80",
-    stats: [
-      { month: "Jan", value: 900 },
-      { month: "Feb", value: 950 },
-      { month: "Mar", value: 1000 },
-      { month: "Apr", value: 1100 },
-      { month: "May", value: 1250 },
-    ],
-  },
-  {
-    id: 5,
     name: "Legends Reborn",
-    genre: "Fantasy Adventure",
+    genre: "Adventure Fantasy",
     platform: "PC / Switch",
     rating: 9.4,
     image:
-      "https://images.unsplash.com/photo-1623059754140-38b41a8f5d11?auto=format&fit=crop&w=800&q=80",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/header_alt_assets_2.jpg",
     stats: [
       { month: "Jan", value: 1300 },
       { month: "Feb", value: 1450 },
       { month: "Mar", value: 1550 },
       { month: "Apr", value: 1700 },
-      { month: "May", value: 1800 },
+      { month: "May", value: 1820 },
     ],
   },
 ];
 
-// Compute max and average rating
 const maxStatValue = Math.max(...games.flatMap((g) => g.stats.map((s) => s.value)));
-const avgRating = games.reduce((acc, g) => acc + g.rating, 0) / games.length;
+const avg = (stats) => stats.reduce((a, s) => a + s.value, 0) / stats.length;
+const peakMonth = (stats) => stats.reduce((a, b) => (b.value > a.value ? b : a)).month;
+const growth = (stats) =>
+  ((stats[stats.length - 1].value - stats[0].value) / stats[0].value) * 100;
 </script>
 
-<style>
-::-webkit-scrollbar {
-  width: 8px;
+<style scoped>
+.dashboard {
+  background: #0f1117;
+  color: #f3f3f3;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  padding: 40px 80px;
+  box-sizing: border-box;
 }
-::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 9999px;
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.header h1 {
+  color: #00c896;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.header p {
+  color: #b3b3b3;
+}
+
+/* Card layout */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  align-items: center; /* center the cards so they don't span full width */
+}
+.card {
+  display: flex;
+  background: #1c1f24;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 200, 150, 0.2);
+}
+.card {
+  /* make cards narrower and center them */
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.card-image {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 16px 0 0 16px;
+}
+.card-content {
+  padding: 18px;
+  flex: 1;
+}
+.game-title {
+  color: #00ffc3;
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+.meta {
+  color: #b0b0b0;
+  margin-bottom: 10px;
+}
+.rating,
+.players {
+  color: #e6e6e6;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+/* Chart section */
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 56px;
+  margin-top: 10px;
+}
+.chart-bar {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.chart-fill {
+  width: 10px;
+  background: linear-gradient(to top, #00c896, #00ffb0);
+  border-radius: 4px;
+  transition: height 0.3s ease;
+}
+
+/* Stats section */
+.stats {
+  margin-top: 60px;
+  background: #181b20;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+}
+.stats h3 {
+  font-size: 1.6rem;
+  color: #00c896;
+  margin-bottom: 20px;
+}
+.stats table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.stats th,
+.stats td {
+  padding: 12px;
+  border-bottom: 1px solid #2b2f35;
+  text-align: left;
+}
+.stats th {
+  color: #999;
+  font-weight: 500;
+}
+.stats td {
+  color: #eaeaea;
+}
+.growth-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.growth-fill {
+  height: 8px;
+  background: linear-gradient(to right, #00ffb2, #00c896);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  min-width: 5px;
+}
+.growth-bar span {
+  font-size: 0.8rem;
+  color: #aaa;
 }
 </style>
