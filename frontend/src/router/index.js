@@ -12,6 +12,8 @@ import PrivacyView from "../views/PrivacyView.vue";
 import TermsView from "../views/TermsView.vue";
 import UserProfileView from "../views/UserProfileView.vue";
 import CartView from "../views/CartView.vue";
+import StatisticsView from "../views/Statistic.vue";
+
 
 const routes = [
   { path: "/", component: MarketplaceView },
@@ -24,6 +26,7 @@ const routes = [
   { path: "/userProfile", component: UserProfileView },
   { path: "/cart", component: CartView },
   { path: "/game/:id", component: GameInfoView },
+  { path: "/statistics", component: StatisticsView },
 ];
 
 const router = createRouter({
