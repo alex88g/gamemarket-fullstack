@@ -1,0 +1,200 @@
+// frontend/src/api.js
+
+Ändra src/api.js en gång (så det funkar i båda lägen)
+
+Byt till env-styrd bas-URL:
+
+import axios from "axios";
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "/api",
+});
+
+// Authorization-interceptor kvar som du har
+api.interceptors.request.use((config) => {
+  const raw = localStorage.getItem('auth')
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw)
+      if (parsed.token) {
+        config.headers.Authorization = `Bearer ${parsed.token}`
+      }
+    } catch {}
+  }
+  return config
+})
+
+export default api
+
+Lokala env-filer (för utveckling utan Docker eller med DB i Docker)
+
+backend/.env
+
+NODE_ENV=development
+PORT=5000
+PGURI="postgres://app_user:AppUser!2025@127.0.0.1:5432/appdb"
+JWT_SECRET=superhemlig_nyckel
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+
+
+frontend/.env
+
+VITE_API_URL=http://localhost:5000/api
+
+
+docker-compose
+
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: appdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # kör bara vid första init av tom volym:
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      # se DB via DNS-namnet "db"
+      PGURI: postgres://app:secret@db:5432/appdb
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "5000"
+    # öppna 5000 direkt utåt **om du vill testa API utan nginx**
+    # ports:
+    #   - "5000:5000"
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"     # Frontend nås via http://SERVER_IP/
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080" # http://SERVER_IP:8080
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+
+
+
+Kör lokalt (dev)
+
+
+# 1) Starta bara DB i Docker (valfritt men smidigt)
+docker compose -f docker-compose up -d
+
+# 2) Backend
+cp backend/.env  backend/.env
+cd backend && npm install && npm run dev   # http://localhost:5000
+
+Test:
+curl http://localhost:5000/api/health
+# öppna http://localhost:5173
+
+
+Produktions-env (när du kör hela stacken i Docker på Azure)
+
+Du kan behålla din nuvarande docker-compose.yml (db + api + web + adminer). Lägg bara en prod-.env för backend.
+
+backend/.env (lägg endast på servern, inte i Git)
+
+NODE_ENV=production
+PORT=5000
+PGURI=postgres://app:secret@db:5432/appdb
+JWT_SECRET=byt-denna-hemlighet
+# Om du hostar frontenden via nginx i samma compose (samma origin) kan detta vara tomt,
+# men du kan lägga din domän/IP här för tydlighet:
+CORS_ORIGINS=http://YOUR_DOMAIN,http://SERVER_IP
+
+
+Din docker-compose.yml sätter redan environment: PGURI=postgres://app:secret@db:5432/appdb på api.
+Det är OK att låta den stå; den överskuggar värdet i .env.
+Alternativt kan du ta bort den raden och låta .env.prod styra välj ett sätt och håll dig till det.
+
+
+frontend/.env
+
+VITE_API_URL=/api
+När nginx proxar /api → api:5000 vill vi att frontend slår mot samma origin.
+
+
+Kör i produktion (på Azure)
+
+# på servern, i repo-roten
+cp backend/.env backend/.env
+cp frontend/.env frontend/.env
+
+docker compose up -d --build
+docker compose ps
+docker compose logs -f api
+
+Frontend: http://SERVER_IP/
+
+API (via proxy): http://SERVER_IP/api/health
+Adminer: http://SERVER_IP:8080
+Öppna portar 80 och 8080 i Azure NSG om det behövs.
+
+
+Snabb växlings-fusklapp
+Lokalt dev:
+
+cp backend/.env backend/.env
+cp frontend/.env frontend/.env
+docker compose -f docker-compose up -d   # endast DB
+(backend) cd backend && npm run dev
+(frontend) cd frontend && npm run dev
+
+Produktion (Azure, full Docker):
+
+cp backend/.env backend/.env
+cp frontend/.env frontend/.env
+docker compose up -d --build
+
+
+Vanliga fallgropar (snabbt)
+Hårdkodad API-URL i frontend → du har nu bytt till VITE_API_URL 
+
+! i PG-lösen → använd citattecken i lokala .env 
+
+Seed körs inte → init.sql körs bara första gången volymen skapas.
+Töm dev-volymen med docker compose -f docker-compose down -v om du vill initiera om.
+
+
+Snabb körning på servern
+
+# i repo-roten på Azure-VM:n
+# lägg endast på servern:
+echo "...din prod-backend .env..." > backend/.env
+echo "VITE_API_URL=/api" > frontend/.env
+
+docker compose up -d --build
+docker compose ps
+docker compose logs -f api
