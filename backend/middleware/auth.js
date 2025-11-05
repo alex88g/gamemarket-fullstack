@@ -13,7 +13,7 @@ export function requireAuth(req, res, next) {
     req.user = decoded; // { id, username, role }
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid token", error: err  });
+    return res.status(401).json({ message: "Invalid token", error: err });
   }
 }
 
