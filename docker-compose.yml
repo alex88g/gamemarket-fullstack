@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: appdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # kör bara vid första init av tom volym:
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      # se DB via DNS-namnet "db"
+      PGURI: postgres://app:secret@db:5432/appdb
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "5000"
+    # öppna 5000 direkt utåt **om du vill testa API utan nginx**
+    # ports:
+    #   - "5000:5000"
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"     # Frontend nås via http://SERVER_IP/
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080" # http://SERVER_IP:8080
+    depends_on:
+      - db
+
+volumes:
+  db_data:
