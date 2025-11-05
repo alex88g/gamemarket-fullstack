@@ -198,3 +198,34 @@ echo "VITE_API_URL=/api" > frontend/.env
 docker compose up -d --build
 docker compose ps
 docker compose logs -f api
+
+
+Sammanfattning:
+
+förbered produktion – Docker, nginx-proxy, Compose, env-styrd API-URL
+
+- Backend:
+  - Dockerfile.backend (node:20-alpine, npm ci, EXPOSE 5000, npm start)
+  - CORS whitelist via CORS_ORIGINS + /api/health-endpoint
+  - PGURI läses från env (Compose host: "db" i produktion)
+  - Exempel på .env för dev/prod inkl. JWT_SECRET
+
+- Frontend:
+  - Dockerfile.frontend (multi-stage build med Vite -> nginx)
+  - nginx.conf med SPA-fallback och proxy /api -> http://api:5000
+  - src/api.js bytt till env-styrd bas-URL: VITE_API_URL || '/api'
+  - .env-exempel: dev = http://localhost:5000/api, prod = /api
+
+- Databas:
+  - Postgres 16 i Compose med persistent volym
+  - init.sql för schema + seed körs vid första start
+  - Healthcheck för pg_isready
+
+- Orkestrering (docker-compose.yml):
+  - Tjänster: db, api, web (nginx), adminer
+  - Korrekt Dockerfile-namn (Dockerfile.backend / .frontend)
+  - web exponerar port 80; api är intern (ports kommenterad)
+  - adminer bundet till 127.0.0.1:8080
+
+- Docs/snabbstart:
+  - Instruktioner för lokal dev och prod (Azure): `docker compose up -d --build`
