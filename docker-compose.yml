@@ -22,9 +22,13 @@ services:
       context: ./backend
       dockerfile: Dockerfile.backend
     restart: unless-stopped
+    # Ladda PORT/JWT_SECRET/CORS_ORIGINS från root .env (inte backend/.env)
     env_file:
       - ./.env
-      - ./backend/.env
+    environment:
+      NODE_ENV: production
+      # se DB via DNS-namnet "db" i Compose-nätet (överskuggar lokal PGURI)
+      PGURI: postgres://postgres:postgres@db:5432/appdb
     depends_on:
       db:
         condition: service_healthy

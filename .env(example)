@@ -1,0 +1,9 @@
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=appdb
+
+PORT=5000
+PGURI=postgres://postgres:postgres@db:5432/appdb
+
+JWT_SECRET=skapa egen kod att sätta här
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
