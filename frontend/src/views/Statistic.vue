@@ -13,9 +13,12 @@
         <div class="card-content">
           <h2 class="game-title">{{ game.name }}</h2>
           <p class="meta">{{ game.genre }} • {{ game.platform }}</p>
-          <p class="rating">Rating: <strong>{{ game.rating }}/10</strong></p>
+          <p class="rating">
+            Rating: <strong>{{ game.rating }}/10</strong>
+          </p>
           <p class="players">
-            Players: {{ game.stats[game.stats.length - 1].value.toLocaleString() }}
+            Players:
+            {{ game.stats[game.stats.length - 1].value.toLocaleString() }}
           </p>
 
           <!-- Chart without labels -->
@@ -76,7 +79,8 @@ const games = [
     genre: "Action RPG",
     platform: "PC / PS5",
     rating: 9.2,
-    image: "https://cdn.mos.cms.futurecdn.net/MQKqAyj3Un8CFMWtwzEEmX-1200-80.jpg",
+    image:
+      "https://cdn.mos.cms.futurecdn.net/MQKqAyj3Un8CFMWtwzEEmX-1200-80.jpg",
     stats: [
       { month: "Jan", value: 820 },
       { month: "Feb", value: 1040 },
@@ -135,9 +139,12 @@ const games = [
   },
 ];
 
-const maxStatValue = Math.max(...games.flatMap((g) => g.stats.map((s) => s.value)));
+const maxStatValue = Math.max(
+  ...games.flatMap((g) => g.stats.map((s) => s.value)),
+);
 const avg = (stats) => stats.reduce((a, s) => a + s.value, 0) / stats.length;
-const peakMonth = (stats) => stats.reduce((a, b) => (b.value > a.value ? b : a)).month;
+const peakMonth = (stats) =>
+  stats.reduce((a, b) => (b.value > a.value ? b : a)).month;
 const growth = (stats) =>
   ((stats[stats.length - 1].value - stats[0].value) / stats[0].value) * 100;
 </script>
@@ -180,7 +187,9 @@ const growth = (stats) =>
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .card:hover {
   transform: translateY(-4px);

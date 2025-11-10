@@ -6,14 +6,17 @@
       <p class="card-sub">Köp eller hyr spel från andra användare.</p>
     </header>
 
-    <div class="card" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+    <div
+      class="card"
+      style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center"
+    >
       <input
         v-model="search"
         class="input-field"
         placeholder="Sök spel eller plattform..."
-        style="max-width:250px;"
+        style="max-width: 250px"
       />
-      <select v-model="sortKey" class="input-field" style="max-width:200px;">
+      <select v-model="sortKey" class="input-field" style="max-width: 200px">
         <option value="title">Sortera: Titel (A–Ö)</option>
         <option value="price_low">Lägsta pris först</option>
         <option value="price_high">Högsta pris först</option>
@@ -25,7 +28,10 @@
       <div class="card-sub">Var först med att lägga upp ett spel!</div>
     </div>
 
-    <div v-else-if="hasAnyGames && hasQuery && filteredGames.length === 0" class="card">
+    <div
+      v-else-if="hasAnyGames && hasQuery && filteredGames.length === 0"
+      class="card"
+    >
       <div class="card-title">Inga träffar</div>
       <div class="card-sub">Justera sökningen eller rensa filtret.</div>
     </div>
@@ -37,6 +43,7 @@
         :game="g"
         @buy="openBuy(g)"
         @rent="openRent(g)"
+        @wishlist="wishlistSoon()"
       />
     </div>
   </section>
@@ -62,31 +69,35 @@ const showModal = ref(false);
 const modalMode = ref("buy"); // 'buy' | 'rent'
 const selectedGame = ref(null);
 
-const search = ref("")
-const sortKey = ref("title")
+const search = ref("");
+const sortKey = ref("title");
 
 const filteredGames = computed(() => {
-  const q = search.value.toLowerCase()
-  let list = games.value.filter((g) =>
-    g.title.toLowerCase().includes(q) ||
-    g.platform.toLowerCase().includes(q)
-  )
+  const q = search.value.toLowerCase();
+  let list = games.value.filter(
+    (g) =>
+      g.title.toLowerCase().includes(q) || g.platform.toLowerCase().includes(q),
+  );
   switch (sortKey.value) {
     case "price_low":
-      list = [...list].sort((a, b) => (a.price_sell ?? 0) - (b.price_sell ?? 0))
-      break
+      list = [...list].sort(
+        (a, b) => (a.price_sell ?? 0) - (b.price_sell ?? 0),
+      );
+      break;
     case "price_high":
-      list = [...list].sort((a, b) => (b.price_sell ?? 0) - (a.price_sell ?? 0))
-      break
+      list = [...list].sort(
+        (a, b) => (b.price_sell ?? 0) - (a.price_sell ?? 0),
+      );
+      break;
     case "title":
-      list = [...list].sort((a, b) => a.title.localeCompare(b.title))
-      break
+      list = [...list].sort((a, b) => a.title.localeCompare(b.title));
+      break;
   }
-  return list
-})
+  return list;
+});
 
-const hasQuery = computed(() => search.value.trim().length > 0)
-const hasAnyGames = computed(() => games.value.length > 0)
+const hasQuery = computed(() => search.value.trim().length > 0);
+const hasAnyGames = computed(() => games.value.length > 0);
 
 const toast = useToastStore();
 
@@ -111,6 +122,10 @@ function openRent(game) {
   selectedGame.value = game;
   modalMode.value = "rent";
   showModal.value = true;
+}
+
+function wishlistSoon() {
+  toast.push("Önskelistan kommer snart");
 }
 
 function closeModal() {

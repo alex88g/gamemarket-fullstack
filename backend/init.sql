@@ -64,6 +64,18 @@ CREATE TABLE IF NOT EXISTS cart_items (
 CREATE INDEX IF NOT EXISTS idx_cart_user ON cart_items(user_id);
 CREATE INDEX IF NOT EXISTS idx_cart_created ON cart_items(created_at);
 
+-- WISHLIST
+CREATE TABLE IF NOT EXISTS wishlists (
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  game_id INT NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (user_id, game_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_wish_user ON wishlists(user_id);
+CREATE INDEX IF NOT EXISTS idx_wish_game ON wishlists(game_id);
+
+
 -- 5) SEED (med fasta id:n för att ägar-id ska stämma)
 INSERT INTO users (id, username, email, password_hash, role)
 VALUES
