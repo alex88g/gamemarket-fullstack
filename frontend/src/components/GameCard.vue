@@ -33,7 +33,7 @@
         <span v-else>-</span>
       </div>
       <div class="card-sub">
-        <strong>Hyr per månad:</strong>
+        <strong>Hyr per månad: </strong>
         <span v-if="game.price_rent_per_month != null"
           >{{ game.price_rent_per_month }} kr</span
         >
@@ -57,6 +57,14 @@
         @click="$emit('rent', game)"
       >
         Hyr
+      </button>
+
+      <button
+        v-if="game.price_rent_per_month != null && game.status === 'available'"
+        class="btn"
+        @click="$emit('wishlist', game)"
+      >
+        Lägg till i önskelista
       </button>
     </div>
 

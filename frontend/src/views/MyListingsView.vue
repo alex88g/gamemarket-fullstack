@@ -106,7 +106,7 @@
         </button>
       </div>
 
-       <!-- BEFINTLIGA ANNONSER -->
+      <!-- BEFINTLIGA ANNONSER -->
       <div class="row" style="gap: 1rem">
         <!-- Filter + sortering -->
         <div class="card row" style="gap: 0.75rem">
@@ -293,9 +293,8 @@
             Spara ändringar
           </button>
         </div>
-      
 
-      <!-- Tomtillstånd / inga träffar -->
+        <!-- Tomtillstånd / inga träffar -->
         <p
           v-if="filteredGames.length === 0 && myGames.length > 0"
           class="card-sub"
@@ -333,8 +332,8 @@ const router = useRouter();
 
 const allGames = ref([]);
 
-const searchQuery = ref("");      
-const sortOrder = ref("newest");  
+const searchQuery = ref("");
+const sortOrder = ref("newest");
 
 const newGame = ref({
   title: "",
@@ -366,11 +365,7 @@ const filteredGames = computed(() => {
     const platform = g.platform?.toLowerCase() || "";
     const desc = g.description?.toLowerCase() || "";
 
-    return (
-      title.includes(q) ||
-      platform.includes(q) ||
-      desc.includes(q)
-    );
+    return title.includes(q) || platform.includes(q) || desc.includes(q);
   });
 
   if (sortOrder.value === "oldest") {
@@ -379,8 +374,6 @@ const filteredGames = computed(() => {
 
   return list;
 });
-
-
 
 function toggleEdit(g) {
   g.editing = !g.editing;

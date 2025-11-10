@@ -3,7 +3,9 @@
   <section class="row" style="gap: 2rem">
     <header class="row" style="gap: 0.5rem">
       <h1 class="card-title">Adminpanel</h1>
-      <p class="card-sub">Endast admin. Moderera annonser och se alla ordrar.</p>
+      <p class="card-sub">
+        Endast admin. Moderera annonser och se alla ordrar.
+      </p>
     </header>
 
     <!-- om inte admin -->
@@ -17,10 +19,13 @@
       <div class="card">
         <div class="card-header" style="margin-top: -0.25rem">
           <h2 class="card-title" style="margin: 0">Annonser (moderering)</h2>
-          <span class="card-sub">{{ filteredGames.length }} av {{ allGames.length }} annonser</span>
+          <span class="card-sub"
+            >{{ filteredGames.length }} av {{ allGames.length }} annonser</span
+          >
         </div>
         <p class="card-sub" style="margin-top: -0.5rem; margin-bottom: 1rem">
-          Blockera olämpliga annonser. Blockerade annonser syns inte på marknaden.
+          Blockera olämpliga annonser. Blockerade annonser syns inte på
+          marknaden.
         </p>
 
         <!-- Filterrad -->
@@ -37,29 +42,32 @@
           </label>
 
           <!-- ersätt din nuvarande Status-grupp -->
-<label class="input-group select" style="min-width: 190px">
-  <span class="input-label">Status</span>
-  <select
-    v-model="statusFilter"
-    class="input-field select-reset"
-    aria-label="Filtrera på status"
-  >
-    <option value="">Alla</option>
-    <option value="available">Tillgänglig</option>
-    <option value="reserved">Reserverad</option>
-    <option value="rented">Uthyrd</option>
-    <option value="sold">Såld</option>
-    <option value="blocked">Blockerad</option>
-  </select>
-</label>
-
+          <label class="input-group select" style="min-width: 190px">
+            <span class="input-label">Status</span>
+            <select
+              v-model="statusFilter"
+              class="input-field select-reset"
+              aria-label="Filtrera på status"
+            >
+              <option value="">Alla</option>
+              <option value="available">Tillgänglig</option>
+              <option value="reserved">Reserverad</option>
+              <option value="rented">Uthyrd</option>
+              <option value="sold">Såld</option>
+              <option value="blocked">Blockerad</option>
+            </select>
+          </label>
 
           <label class="checkbox">
             <input v-model="withImageOnly" type="checkbox" />
             <span>Endast med bild</span>
           </label>
 
-          <button class="btn outline" @click="resetGameFilters" aria-label="Rensa filter">
+          <button
+            class="btn outline"
+            @click="resetGameFilters"
+            aria-label="Rensa filter"
+          >
             Rensa filter
           </button>
         </div>
@@ -83,13 +91,21 @@
                 <td :data-label="'ID'">#{{ g.id }}</td>
 
                 <td :data-label="'Titel'" style="min-width: 160px">
-                  <div style="font-weight: 500; color: var(--text-main)">{{ g.title }}</div>
-                  <div class="card-sub" style="font-size: 0.7rem">{{ g.platform }}</div>
+                  <div style="font-weight: 500; color: var(--text-main)">
+                    {{ g.title }}
+                  </div>
+                  <div class="card-sub" style="font-size: 0.7rem">
+                    {{ g.platform }}
+                  </div>
                 </td>
 
                 <td :data-label="'Ägare'" style="min-width: 120px">
-                  <div style="font-weight: 500; color: var(--text-main)">{{ g.ownerName }}</div>
-                  <div class="card-sub" style="font-size: 0.7rem">owner_id: {{ g.owner_id }}</div>
+                  <div style="font-weight: 500; color: var(--text-main)">
+                    {{ g.ownerName }}
+                  </div>
+                  <div class="card-sub" style="font-size: 0.7rem">
+                    owner_id: {{ g.owner_id }}
+                  </div>
                 </td>
 
                 <td :data-label="'Status'">
@@ -99,7 +115,9 @@
                 </td>
 
                 <td :data-label="'Säljes'">{{ g.price_sell ?? "-" }} kr</td>
-                <td :data-label="'Hyra/mån'">{{ g.price_rent_per_month ?? "-" }} kr</td>
+                <td :data-label="'Hyra/mån'">
+                  {{ g.price_rent_per_month ?? "-" }} kr
+                </td>
 
                 <td :data-label="'Bild'">
                   <img
@@ -119,7 +137,7 @@
                     @click="blockGame(g)"
                     :aria-label="`Blockera annons ${g.id}`"
                   >
-                    {{ busyId === g.id ? 'Blockerar…' : 'Blockera' }}
+                    {{ busyId === g.id ? "Blockerar…" : "Blockera" }}
                   </button>
 
                   <button
@@ -129,7 +147,7 @@
                     @click="unblockGame(g)"
                     :aria-label="`Tillåt annons ${g.id} igen`"
                   >
-                    {{ busyId === g.id ? 'Tillåter…' : 'Tillåt igen' }}
+                    {{ busyId === g.id ? "Tillåter…" : "Tillåt igen" }}
                   </button>
                 </td>
               </tr>
@@ -146,7 +164,9 @@
       <div class="card">
         <div class="card-header" style="margin-top: -0.25rem">
           <h2 class="card-title" style="margin: 0">Alla ordrar</h2>
-          <span class="card-sub">{{ filteredOrders.length }} av {{ allOrders.length }} ordrar</span>
+          <span class="card-sub"
+            >{{ filteredOrders.length }} av {{ allOrders.length }} ordrar</span
+          >
         </div>
         <p class="card-sub" style="margin-top: -0.5rem; margin-bottom: 1rem">
           Köphistorik & hyror i hela systemet.
@@ -167,14 +187,22 @@
 
           <label class="input-group" style="min-width: 160px">
             <span class="input-label">Typ</span>
-            <select v-model="typeFilter" class="input-field" aria-label="Filtrera på ordertyp">
+            <select
+              v-model="typeFilter"
+              class="input-field"
+              aria-label="Filtrera på ordertyp"
+            >
               <option value="">Alla</option>
               <option value="buy">buy</option>
               <option value="rent">rent</option>
             </select>
           </label>
 
-          <button class="btn outline" @click="resetOrderFilters" aria-label="Rensa filter">
+          <button
+            class="btn outline"
+            @click="resetOrderFilters"
+            aria-label="Rensa filter"
+          >
             Rensa filter
           </button>
         </div>
@@ -197,17 +225,29 @@
                 <td :data-label="'Order-ID'">#{{ o.id }}</td>
 
                 <td :data-label="'Köpare'">
-                  <div style="font-weight: 500; color: var(--text-main)">{{ o.buyerName }}</div>
-                  <div class="card-sub" style="font-size: 0.7rem">id: {{ o.buyer_id }}</div>
+                  <div style="font-weight: 500; color: var(--text-main)">
+                    {{ o.buyerName }}
+                  </div>
+                  <div class="card-sub" style="font-size: 0.7rem">
+                    id: {{ o.buyer_id }}
+                  </div>
                 </td>
 
                 <td :data-label="'Spel'">
-                  <div style="font-weight: 500; color: var(--text-main)">{{ o.gameTitle }}</div>
-                  <div class="card-sub" style="font-size: 0.7rem">gameId: {{ o.game_id }}</div>
+                  <div style="font-weight: 500; color: var(--text-main)">
+                    {{ o.gameTitle }}
+                  </div>
+                  <div class="card-sub" style="font-size: 0.7rem">
+                    gameId: {{ o.game_id }}
+                  </div>
                 </td>
 
                 <td :data-label="'Typ'">
-                  <span class="badge" :class="o.type === 'buy' ? 'success' : 'warn'">{{ o.type }}</span>
+                  <span
+                    class="badge"
+                    :class="o.type === 'buy' ? 'success' : 'warn'"
+                    >{{ o.type }}</span
+                  >
                 </td>
 
                 <td :data-label="'Pris'">{{ o.total_price }} kr</td>
@@ -219,7 +259,9 @@
                   <div v-else>–</div>
                 </td>
 
-                <td :data-label="'Skapad'" class="card-sub">{{ formatDateTime(o.created_at) }}</td>
+                <td :data-label="'Skapad'" class="card-sub">
+                  {{ formatDateTime(o.created_at) }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -265,7 +307,8 @@ const filteredGames = computed(() => {
       g.title?.toLowerCase().includes(q) ||
       g.platform?.toLowerCase().includes(q) ||
       g.ownerName?.toLowerCase().includes(q);
-    const matchesStatus = !statusFilter.value || g.status === statusFilter.value;
+    const matchesStatus =
+      !statusFilter.value || g.status === statusFilter.value;
     const matchesImage = !withImageOnly.value || !!g.image_url;
     return matchesQ && matchesStatus && matchesImage;
   });
@@ -399,9 +442,9 @@ onMounted(() => {
 }
 
 .checkbox {
-   grid-column: 1 / 2;     /* samma kolumn som sök */
+  grid-column: 1 / 2; /* samma kolumn som sök */
   align-self: start;
-  margin-top: 0.35rem;    /* liten luft under inputen */
+  margin-top: 0.35rem; /* liten luft under inputen */
 }
 
 .thumb {
@@ -445,7 +488,6 @@ onMounted(() => {
 @media (max-width: 720px) {
   .stacked-table thead {
     display: none;
-    
   }
   .stacked-table tbody tr {
     display: grid;
@@ -456,10 +498,8 @@ onMounted(() => {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     background: var(--bg-card);
-   
   }
   .stacked-table tbody td {
-   
   }
   .stacked-table tbody td::before {
     content: attr(data-label);
@@ -481,7 +521,9 @@ onMounted(() => {
   }
 }
 
-.select { position: relative; }
+.select {
+  position: relative;
+}
 .select-reset {
   appearance: none;
   -webkit-appearance: none;
@@ -490,7 +532,7 @@ onMounted(() => {
 .select::after {
   content: "▾";
   position: absolute;
-  right: 0.6rem;                  /* flytta pilen från högra kanten */
+  right: 0.6rem; /* flytta pilen från högra kanten */
   top: 70%;
   transform: translateY(-50%);
   font-size: 0.9rem;

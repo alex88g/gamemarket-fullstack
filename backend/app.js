@@ -44,15 +44,15 @@ app.get("/api/health", (req, res) => {
 });
 
 // Kollar om databasen funkar
-app.get('/api/ready', async (req, res) => {
+app.get("/api/ready", async (req, res) => {
   try {
-    await assertDbConnection()
-    res.json({ ok: true })
+    await assertDbConnection();
+    res.json({ ok: true });
   } catch (err) {
-    console.error('Ready check failed:', err?.message || err)
-    res.status(503).json({ ok: false, error: 'db_unavailable' })
+    console.error("Ready check failed:", err?.message || err);
+    res.status(503).json({ ok: false, error: "db_unavailable" });
   }
-})
+});
 
 const PORT = process.env.PORT || 5000;
 
