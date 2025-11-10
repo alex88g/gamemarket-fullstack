@@ -106,10 +106,36 @@
         </button>
       </div>
 
-      <!-- BEFINTLIGA ANNONSER -->
+       <!-- BEFINTLIGA ANNONSER -->
       <div class="row" style="gap: 1rem">
+        <!-- Filter + sortering -->
+        <div class="card row" style="gap: 0.75rem">
+          <div
+            class="row"
+            style="gap: 1rem; align-items: flex-end; flex-wrap: wrap"
+          >
+            <div class="input-group" style="flex: 1 1 220px">
+              <label class="input-label">Sök i dina annonser</label>
+              <input
+                class="input-field"
+                v-model="searchQuery"
+                placeholder="Sök på titel, plattform eller beskrivning..."
+              />
+            </div>
+
+            <div class="input-group" style="width: 220px">
+              <label class="input-label">Sortera</label>
+              <select class="input-field" v-model="sortOrder">
+                <option value="newest">Nyast först</option>
+                <option value="oldest">Äldst först</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista med filtrerade + sorterade annonser -->
         <div
-          v-for="g in myGames"
+          v-for="g in filteredGames"
           :key="g.id"
           class="card row"
           style="gap: 1rem"
@@ -267,6 +293,18 @@
             Spara ändringar
           </button>
         </div>
+      
+
+      <!-- Tomtillstånd / inga träffar -->
+        <p
+          v-if="filteredGames.length === 0 && myGames.length > 0"
+          class="card-sub"
+        >
+          Inga annonser matchade din sökning.
+        </p>
+        <p v-if="myGames.length === 0" class="card-sub">
+          Du har inga annonser ännu. Skapa din första ovan 👆
+        </p>
       </div>
     </template>
 
@@ -295,6 +333,9 @@ const router = useRouter();
 
 const allGames = ref([]);
 
+const searchQuery = ref("");      
+const sortOrder = ref("newest");  
+
 const newGame = ref({
   title: "",
   platform: "PS5",
@@ -314,6 +355,32 @@ const toDelete = ref(null);
 const myGames = computed(() =>
   allGames.value.filter((g) => g.owner_id === auth.user?.id),
 );
+
+const filteredGames = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
+
+  let list = myGames.value.filter((g) => {
+    if (!q) return true;
+
+    const title = g.title?.toLowerCase() || "";
+    const platform = g.platform?.toLowerCase() || "";
+    const desc = g.description?.toLowerCase() || "";
+
+    return (
+      title.includes(q) ||
+      platform.includes(q) ||
+      desc.includes(q)
+    );
+  });
+
+  if (sortOrder.value === "oldest") {
+    return [...list].reverse();
+  }
+
+  return list;
+});
+
+
 
 function toggleEdit(g) {
   g.editing = !g.editing;
