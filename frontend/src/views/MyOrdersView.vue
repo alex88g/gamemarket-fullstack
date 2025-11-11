@@ -10,7 +10,29 @@
       <div class="card-sub">Logga in för att se dina ordrar.</div>
     </div>
 
-    <div v-else class="card table-wrapper">
+     <div v-else class="card">
+      <!-- Filter + sortering ligger INNE i v-else-card -->
+      <div class="row" style="gap: 0.75rem; margin-bottom: 1rem">
+        <div class="input-group" style="flex: 1 1 220px">
+          <label class="input-label">Sök i dina ordrar</label>
+          <input
+            class="input-field"
+            v-model="searchQuery"
+            placeholder="Sök på spel, plattform eller typ..."
+          />
+        </div>
+
+        <div class="input-group" style="width: 220px">
+          <label class="input-label">Sortera</label>
+          <select class="input-field" v-model="sortOrder">
+            <option value="newest">Nyast först</option>
+            <option value="oldest">Äldst först</option>
+          </select>
+        </div>
+      </div>
+
+
+    <div class="table-wrapper">
       <table>
         <thead>
           <tr>
@@ -22,7 +44,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="o in orders" :key="o.id">
+         <tr v-for="o in filteredOrders" :key="o.id">
             <td>
               <div style="font-weight: 500; color: var(--text-main)">
                 {{ o.gameTitle }}
@@ -55,11 +77,12 @@
         </tbody>
       </table>
     </div>
+     </div>
   </section>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../api.js";
 import { useAuthStore } from "../store/auth.js";
@@ -70,6 +93,39 @@ const toast = useToastStore();
 const router = useRouter();
 
 const orders = ref([]);
+
+const searchQuery = ref("");
+const sortOrder = ref("newest");
+
+const filteredOrders = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
+
+  let list = orders.value.filter((o) => {
+    if (!q) return true;
+
+    const title = o.gameTitle?.toLowerCase() || "";
+    const platform = o.platform?.toLowerCase() || "";
+    const type = o.type?.toLowerCase() || "";
+
+    return (
+      title.includes(q) ||
+      platform.includes(q) ||
+      type.includes(q)
+    );
+  });
+
+  list = [...list].sort((a, b) => {
+    const da = new Date(a.created_at);
+    const db = new Date(b.created_at);
+
+    if (sortOrder.value === "oldest") {
+      return da - db; // äldst först
+    }
+    return db - da; // nyast först
+  });
+
+  return list;
+});
 
 async function loadOrders() {
   try {
