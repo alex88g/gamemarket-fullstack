@@ -43,7 +43,7 @@
         :game="g"
         @buy="openBuy(g)"
         @rent="openRent(g)"
-        @wishlist="wishlistSoon()"
+        @toggle-wish="toggleWish(g)"
       />
     </div>
   </section>
@@ -124,8 +124,14 @@ function openRent(game) {
   showModal.value = true;
 }
 
-function wishlistSoon() {
-  toast.push("Önskelistan kommer snart");
+async function toggleWish(game) {
+  try {
+    await api.post("/user/wishlist", { game_id: game.id });
+    toast.push("Tillagd i önskelistan", "success");
+  } catch (err) {
+    console.error(err);
+    toast.push("Kunde inte lägga till i önskelistan", "error");
+  }
 }
 
 function closeModal() {

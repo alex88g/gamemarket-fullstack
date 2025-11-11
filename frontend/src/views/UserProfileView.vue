@@ -65,11 +65,10 @@ const dirty = computed(
 
 async function loadMe() {
   try {
-    // Get user from DB instead of auth
+    // Hämta användare från DB istället för auth
     const { data } = await api.get("/user/me");
     username.value = data.username || "";
     email.value = data.email || "";
-    // Update auth with db data as well
     auth.user = { ...auth.user, ...data };
   } catch (err) {
     console.error(err);
@@ -87,7 +86,7 @@ async function save() {
       username: username.value,
       email: email.value,
     });
-    // update auth and input fields with db data
+    // Uppdatera auth och input fields
     auth.user = { ...auth.user, ...data };
     username.value = data.username;
     email.value = data.email;

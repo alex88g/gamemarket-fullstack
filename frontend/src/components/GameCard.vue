@@ -60,11 +60,21 @@
       </button>
 
       <button
-        v-if="game.price_rent_per_month != null && game.status === 'available'"
-        class="btn"
-        @click="$emit('wishlist', game)"
+        v-if="!hideWish"
+        class="btn outline"
+        style="font-size: 0.8rem; margin-left: 0.5rem"
+        @click="$emit('toggle-wish', game)"
       >
         Lägg till i önskelista
+      </button>
+
+      <button
+        v-if="hideWish"
+        class="btn danger"
+        style="font-size: 0.8rem; margin-left: 0.5rem"
+        @click="$emit('remove-wish', game)"
+      >
+        Ta bort från önskelista
       </button>
     </div>
 
@@ -81,6 +91,7 @@ import { useAuthStore } from "../store/auth.js";
 
 const props = defineProps({
   game: { type: Object, required: true },
+  hideWish: { type: Boolean, default: false },
 });
 
 const auth = useAuthStore();
