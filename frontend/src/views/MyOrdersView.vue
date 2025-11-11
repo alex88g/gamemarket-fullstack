@@ -10,7 +10,7 @@
       <div class="card-sub">Logga in för att se dina ordrar.</div>
     </div>
 
-     <div v-else class="card">
+    <div v-else class="card">
       <!-- Filter + sortering ligger INNE i v-else-card -->
       <div class="row" style="gap: 0.75rem; margin-bottom: 1rem">
         <div class="input-group" style="flex: 1 1 220px">
@@ -31,53 +31,52 @@
         </div>
       </div>
 
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Spel</th>
+              <th>Typ</th>
+              <th>Pris totalt</th>
+              <th>Period</th>
+              <th>Datum</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="o in filteredOrders" :key="o.id">
+              <td>
+                <div style="font-weight: 500; color: var(--text-main)">
+                  {{ o.gameTitle }}
+                </div>
+                <div class="card-sub" style="font-size: 0.7rem">
+                  {{ o.platform }}
+                </div>
+              </td>
 
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Spel</th>
-            <th>Typ</th>
-            <th>Pris totalt</th>
-            <th>Period</th>
-            <th>Datum</th>
-          </tr>
-        </thead>
-        <tbody>
-         <tr v-for="o in filteredOrders" :key="o.id">
-            <td>
-              <div style="font-weight: 500; color: var(--text-main)">
-                {{ o.gameTitle }}
-              </div>
-              <div class="card-sub" style="font-size: 0.7rem">
-                {{ o.platform }}
-              </div>
-            </td>
+              <td>
+                <span
+                  class="badge"
+                  :class="o.type === 'buy' ? 'success' : 'warn'"
+                >
+                  {{ o.type }}
+                </span>
+              </td>
 
-            <td>
-              <span
-                class="badge"
-                :class="o.type === 'buy' ? 'success' : 'warn'"
-              >
-                {{ o.type }}
-              </span>
-            </td>
+              <td>{{ o.total_price }} kr</td>
 
-            <td>{{ o.total_price }} kr</td>
+              <td>
+                <div v-if="o.type === 'rent'">
+                  <div class="card-sub">{{ o.rental_months }} mån</div>
+                </div>
+                <div v-else>-</div>
+              </td>
 
-            <td>
-              <div v-if="o.type === 'rent'">
-                <div class="card-sub">{{ o.rental_months }} mån</div>
-              </div>
-              <div v-else>-</div>
-            </td>
-
-            <td class="card-sub">{{ o.created_at }}</td>
-          </tr>
-        </tbody>
-      </table>
+              <td class="card-sub">{{ o.created_at }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-     </div>
   </section>
 </template>
 
@@ -107,11 +106,7 @@ const filteredOrders = computed(() => {
     const platform = o.platform?.toLowerCase() || "";
     const type = o.type?.toLowerCase() || "";
 
-    return (
-      title.includes(q) ||
-      platform.includes(q) ||
-      type.includes(q)
-    );
+    return title.includes(q) || platform.includes(q) || type.includes(q);
   });
 
   list = [...list].sort((a, b) => {

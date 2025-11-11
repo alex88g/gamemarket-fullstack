@@ -96,3 +96,63 @@ export async function deleteMe(req, res) {
     return res.status(500).json({ message: "Server error" });
   }
 }
+
+export async function getWishlist(req, res) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "No auth user" });
+    const { rows } = await pool.query(
+      `
+      SELECT g.*
+      FROM wishlists w
+      JOIN games g ON g.id = w.game_id
+      WHERE w.user_id = $1
+      ORDER BY w.created_at DESC
+    `,
+      [userId],
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+export async function addWishlist(req, res) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "No auth user" });
+    const { game_id } = req.body;
+    if (!game_id) return res.status(400).json({ error: "game_id required" });
+
+    await pool.query(
+      `
+      INSERT INTO wishlists (user_id, game_id)
+      VALUES ($1, $2)
+      ON CONFLICT (user_id, game_id) DO NOTHING
+    `,
+      [userId, Number(game_id)],
+    );
+
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+export async function removeWishlist(req, res) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "No auth user" });
+    const gameId = Number(req.params.gameId);
+    await pool.query(`DELETE FROM wishlists WHERE user_id=$1 AND game_id=$2`, [
+      userId,
+      gameId,
+    ]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+}

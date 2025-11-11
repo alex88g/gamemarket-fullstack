@@ -499,8 +499,6 @@ onMounted(() => {
     border-radius: var(--radius-lg);
     background: var(--bg-card);
   }
-  .stacked-table tbody td {
-  }
   .stacked-table tbody td::before {
     content: attr(data-label);
     font-weight: 600;
