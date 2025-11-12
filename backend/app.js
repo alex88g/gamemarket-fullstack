@@ -17,7 +17,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const allowed = (process.env.CORS_ORIGINS || "http://localhost:5173")
+const allowed = (process.env.CORS_ORIGINS || "http://localhost")
   .split(",")
   .filter(Boolean);
 
