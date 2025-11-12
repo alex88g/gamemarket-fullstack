@@ -2,11 +2,11 @@
 
 En komplett, ren backend för ditt projekt med **Express**, **PostgreSQL (`pg`)**, **bcryptjs**, **JWT**, **CORS** och **dotenv**.
 
-- ✅ Express-server med CORS  
-- ✅ PostgreSQL via `pg` (Pool)  
-- ✅ Registrering & inloggning (bcrypt + JWT)  
-- ✅ JWT-middleware för skyddade endpoints  
-- ✅ `.env`-stöd  
+- ✅ Express-server med CORS
+- ✅ PostgreSQL via `pg` (Pool)
+- ✅ Registrering & inloggning (bcrypt + JWT)
+- ✅ JWT-middleware för skyddade endpoints
+- ✅ `.env`-stöd
 - ✅ Färdigt `init.sql` för schema + seed
 
 > **Krav:** Node 18+ · PostgreSQL 14+ (du kör 18) · Windows/macOS/Linux
@@ -15,18 +15,18 @@ En komplett, ren backend för ditt projekt med **Express**, **PostgreSQL (`pg`)*
 
 ## Innehåll
 
-1. [Snabbstart (TL;DR)](#snabbstart-tldr)  
-2. [Projektstruktur](#projektstruktur)  
-3. [Installera beroenden](#installera-beroenden)  
-4. [Konfiguration (.env)](#konfiguration-env)  
-5. [Kodfiler (kärna)](#kodfiler-kärna)  
-6. [Initiera PostgreSQL-databasen](#initiera-postgresql-databasen)  
-   - [Windows (PowerShell)](#windows-powershell)  
-   - [macOS/Linux (Terminal)](#macoslinux-terminal)  
-   - [Verifiera installationen](#verifiera-installationen)  
-7. [Starta servern](#starta-servern)  
-8. [Snabbtest (HTTP)](#snabbtest-http)  
-9. [Felsökning](#felsökning)  
+1. [Snabbstart (TL;DR)](#snabbstart-tldr)
+2. [Projektstruktur](#projektstruktur)
+3. [Installera beroenden](#installera-beroenden)
+4. [Konfiguration (.env)](#konfiguration-env)
+5. [Kodfiler (kärna)](#kodfiler-kärna)
+6. [Initiera PostgreSQL-databasen](#initiera-postgresql-databasen)
+   - [Windows (PowerShell)](#windows-powershell)
+   - [macOS/Linux (Terminal)](#macoslinux-terminal)
+   - [Verifiera installationen](#verifiera-installationen)
+7. [Starta servern](#starta-servern)
+8. [Snabbtest (HTTP)](#snabbtest-http)
+9. [Felsökning](#felsökning)
 10. [PSQL-knep (bilaga)](#psql-knep-bilaga)
 
 ---
@@ -141,10 +141,10 @@ CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ### `db.js`
 
 ```js
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-import pkg from 'pg';
+import pkg from "pg";
 const { Pool } = pkg;
 
 // PGURI ex: postgres://user:pass@host:5432/db
@@ -155,8 +155,8 @@ export const pool = new Pool({
 export async function assertDbConnection() {
   const client = await pool.connect();
   try {
-    await client.query('SELECT 1');
-    console.log('✅ PostgreSQL connected');
+    await client.query("SELECT 1");
+    console.log("✅ PostgreSQL connected");
   } finally {
     client.release();
   }
@@ -218,27 +218,27 @@ app.listen(PORT, async () => {
 ### `middleware/auth.js`
 
 ```js
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 
 export function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization
-  if (!authHeader) return res.status(401).json({ message: 'No token' })
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: "No token" });
 
-  const token = authHeader.split(' ')[1]
+  const token = authHeader.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = decoded // { id, username, role }
-    next()
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // { id, username, role }
+    next();
   } catch {
-    return res.status(401).json({ message: 'Invalid token' })
+    return res.status(401).json({ message: "Invalid token" });
   }
 }
 
 export function requireAdmin(req, res, next) {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Admins only' })
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admins only" });
   }
-  next()
+  next();
 }
 ```
 
@@ -249,28 +249,34 @@ export function requireAdmin(req, res, next) {
 > **Viktigt:** Spara `init.sql` som **UTF-8 (utan BOM)** för att undvika teckenfel på Windows.
 
 `init.sql` innehåller:
-- Tabeller: `users`, `games`, `orders`, `cart_items`  
-- Index, constraints  
+
+- Tabeller: `users`, `games`, `orders`, `cart_items`
+- Index, constraints
 - Seed: 3 users + 10 games (körbar flera gånger via `ON CONFLICT`)
 
 ### Windows (PowerShell)
 
-1) **Öppna PowerShell** och gå till din backend-mapp:
+1. **Öppna PowerShell** och gå till din backend-mapp:
+
 ```powershell
 cd C:\Users\alexander\gamemarket-fullstack\backend
 ```
 
-2) **(Rekommenderat) Sätt UTF-8 i konsolen** för att slippa åäö-problem:
+2. **(Rekommenderat) Sätt UTF-8 i konsolen** för att slippa åäö-problem:
+
 ```powershell
 chcp 65001 | Out-Null
 $env:PGCLIENTENCODING = 'UTF8'
 ```
 
-3) **Skapa roll och databas** (kör som `postgres`):
+3. **Skapa roll och databas** (kör som `postgres`):
+
 ```powershell
 & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -h 127.0.0.1 -U postgres -d postgres -W
 ```
+
 Klistra in i psql:
+
 ```sql
 DO $$
 BEGIN
@@ -283,7 +289,8 @@ CREATE DATABASE appdb OWNER app_user;
 \q
 ```
 
-4) **Kör `init.sql` mot `appdb` som `app_user`:**
+4. **Kör `init.sql` mot `appdb` som `app_user`:**
+
 ```powershell
 & "C:\Program Files\PostgreSQL\18\bin\psql.exe" `
   -h 127.0.0.1 -U app_user -d appdb -W `
@@ -291,8 +298,10 @@ CREATE DATABASE appdb OWNER app_user;
   -f .\init.sql
 ```
 
-> Om du får `permission denied for schema public`:  
+> Om du får `permission denied for schema public`:
+>
 > - Antingen kör `init.sql` som `postgres`, **eller** sätt ägarskap:
+
 ```powershell
 & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -h 127.0.0.1 -U postgres -d appdb -W -c "ALTER SCHEMA public OWNER TO app_user;"
 & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -h 127.0.0.1 -U postgres -d appdb -W -c "ALTER TABLE public.users, public.games, public.orders, public.cart_items OWNER TO app_user;"
@@ -323,6 +332,7 @@ psql -h 127.0.0.1 -U app_user -d appdb -v ON_ERROR_STOP=1 -f ./init.sql
 ### Verifiera installationen
 
 Windows:
+
 ```powershell
 "C:\Program Files\PostgreSQL\18\bin\psql.exe" -h 127.0.0.1 -U app_user -d appdb -W -c "\dt"
 "C:\Program Files\PostgreSQL\18\bin\psql.exe" -h 127.0.0.1 -U app_user -d appdb -W -c "SELECT COUNT(*) FROM users;"
@@ -330,6 +340,7 @@ Windows:
 ```
 
 Snabbt testa Node-koppling (läser `PGURI` från `.env`):
+
 ```bash
 node -e "require('dotenv').config(); const {Pool}=require('pg'); const p=new Pool({connectionString:process.env.PGURI}); p.query('select now()').then(r=>{console.log(r.rows[0]); p.end();}).catch(e=>{console.error(e); process.exit(1);});"
 ```
@@ -344,6 +355,7 @@ npm run dev   # eller npm start
 ```
 
 Förväntad output:
+
 ```
 🚀 Server listening on http://localhost:5000
 ✅ PostgreSQL connected
@@ -354,11 +366,13 @@ Förväntad output:
 ## Snabbtest (HTTP)
 
 **Health**
+
 ```bash
 curl http://localhost:5000/api/health
 ```
 
 **Registrera**
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
@@ -366,6 +380,7 @@ curl -X POST http://localhost:5000/api/auth/register \
 ```
 
 **Logga in**
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -373,6 +388,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 ```
 
 Använd `token` för skyddade endpoints:
+
 ```bash
 curl http://localhost:5000/api/orders \
   -H "Authorization: Bearer <DIN_JWT_TOKEN>"
@@ -385,14 +401,17 @@ curl http://localhost:5000/api/orders \
 ## Felsökning
 
 - **`password authentication failed for user "postgres"`**  
-  Kontrollera att du satt/kommer ihåg postgres-lösenordet. Logga in med `psql -U postgres -W` och kör ev.:  
+  Kontrollera att du satt/kommer ihåg postgres-lösenordet. Logga in med `psql -U postgres -W` och kör ev.:
+
   ```sql
   ALTER USER postgres WITH PASSWORD 'NyttStarktLosen!';
   ```
+
   Se även `pg_hba.conf` om autentiseringsmetod (ska vara `scram-sha-256` normalt).
 
 - **`permission denied for schema public`**  
   Kör `init.sql` som `postgres` **eller** ge `app_user` ägarskap:
+
   ```sql
   ALTER SCHEMA public OWNER TO app_user;
   ALTER TABLE public.users, public.games, public.orders, public.cart_items OWNER TO app_user;
@@ -401,14 +420,17 @@ curl http://localhost:5000/api/orders \
 
 - **Teckenfel på Windows (WIN1252 vs UTF-8), ex. `character with byte sequence ... has no equivalent in UTF8`**  
   Spara `init.sql` som **UTF-8** och sätt:
+
   ```powershell
   chcp 65001 | Out-Null
   $env:PGCLIENTENCODING = 'UTF8'
   ```
+
   Kör sedan `psql ... -f .\init.sql` igen.
 
 - **`role "app_user" does not exist`**  
   Skapa rollen innan du skapar databasen:
+
   ```sql
   DO $$
   BEGIN
@@ -441,5 +463,3 @@ SELECT current_user, current_database();
 ```
 
 ---
-
-

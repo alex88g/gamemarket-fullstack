@@ -1,5 +1,4 @@
 <!-- src/views/TermsView.vue -->
-<!-- src/views/TermsView.vue -->
 <template>
   <section class="legal-wrapper">
     <article class="card prose" v-html="html"></article>
