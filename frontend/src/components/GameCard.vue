@@ -7,6 +7,7 @@
         v-if="game.image_url"
         class="game-thumb"
         :src="game.image_url"
+        loading="lazy"
         :alt="game.title"
       />
 

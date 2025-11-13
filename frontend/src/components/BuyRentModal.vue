@@ -34,6 +34,7 @@
         <img
           v-if="game.image_url"
           :src="game.image_url"
+          loading="lazy"
           :alt="game.title"
           style="
             width: 100%;
