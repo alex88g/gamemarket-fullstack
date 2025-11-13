@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS wishlists (
 
 CREATE INDEX IF NOT EXISTS idx_wish_user ON wishlists(user_id);
 CREATE INDEX IF NOT EXISTS idx_wish_game ON wishlists(game_id);
+CREATE INDEX IF NOT EXISTS idx_wishlist_user_created ON wishlists(user_id, created_at DESC);
 
 
 -- 5) SEED (med fasta id:n för att ägar-id ska stämma)
