@@ -6,17 +6,14 @@
       <p class="card-sub">Köp eller hyr spel från andra användare.</p>
     </header>
 
-    <div
-      class="card"
-      style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center"
-    >
+   <div class="card market-filter-card">
       <input
         v-model="search"
         class="input-field"
         placeholder="Sök spel eller plattform..."
         style="max-width: 250px"
       />
-      <select v-model="sortKey" class="input-field" style="max-width: 200px">
+      <select v-model="sortKey" class="input-field" style="max-width: 200px" aria-label="Sortera">
         <option value="title">Sortera: Titel (A–Ö)</option>
         <option value="price_low">Lägsta pris först</option>
         <option value="price_high">Högsta pris först</option>
@@ -148,3 +145,13 @@ onMounted(() => {
   refresh();
 });
 </script>
+
+<style scoped>
+.market-filter-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.25rem;
+}
+</style>

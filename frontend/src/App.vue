@@ -257,8 +257,8 @@ body {
   top: 0;
   z-index: 20;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(10px);
+  background: #0f172a; /* solid dark background instead of rgba(...) */
+  backdrop-filter: blur(10px); /* can keep or drop, doesn’t affect contrast */
 }
 
 .nav-inner {
@@ -378,8 +378,8 @@ body {
 
 .nav-btn.router-link-active {
   border-color: var(--accent);
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--accent-hover);
+  background: var(--accent);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -614,8 +614,8 @@ td {
   border-color: var(--text-main);
 }
 .footer-link:visited {
-  color: var(--text-dim);
-  border-color: rgba(148, 163, 184, 0.35);
+  color: #9ca3af;
+  border-color: rgba(156, 163, 175, 0.4);
 }
 
 /* ------- Kundvagnsbadge ------- */
